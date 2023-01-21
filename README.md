@@ -1,3 +1,5 @@
+![Github All Releases](https://img.shields.io/github/downloads/SrLicht/SCP-575/total.svg)   <a href="https://github.com/SrLicht/SCP-575/releases"><img src="https://img.shields.io/github/v/release/SrLicht/SCP-575?include_prereleases&label=Last Release" alt="Releases"></a> 
+
 # What does this do?
 This plugin tries to insert the SCP-575 to SCP:SL, every round there is a probability that the SCP-575 will spawn when spawning every so often a blackout will occur in LCZ or HCZ, when the blackout occurs it will take a random player that is in the blackout zone and spawn an NPC that will chase the player, if the player is touched by the SCP-575 he is eaten and killed in the process.
 
