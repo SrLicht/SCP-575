@@ -14,9 +14,12 @@ namespace SCP575
 
         [Description("Enable the Logs.Debug of SCPSLAudioApi, warning can be very spammy.")]
         public bool AudioDebug { get; set; } = false;
+        
+        [Description("Blackout affects HeavyContaminet ?")]
+        public bool ActiveInHeavy { get; set; } = false;
 
-        [Description("SCP-575 works only in HeavyContainment ? enabling this setting causes the SCP-575 to no longer appear in LightContainment.")]
-        public bool OnlyInHeavy { get; set; } = false;
+        [Description("Does the blackout affect LightContaiment ?")]
+        public bool ActiveInLight { get; set; } = true;
 
         [Description("The per-round probability of SCP-575 appearing")]
         public int SpawnChance { get; set; } = 40;
@@ -55,7 +58,12 @@ namespace SCP575
         public List<RoomName> BlackListRooms { get; set; } = new()
         {
             RoomName.Lcz914,
-            RoomName.LczArmory
+            RoomName.LczArmory,
+            RoomName.LczCheckpointA,
+            RoomName.LczCheckpointB,
+            RoomName.HczArmory,
+            RoomName.HczCheckpointA,
+            RoomName.HczCheckpointB
         };
     }
 

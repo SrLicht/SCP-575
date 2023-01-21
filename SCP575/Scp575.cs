@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HarmonyLib;
+using Interactables.Interobjects.DoorUtils;
 using MapGeneration;
 using MEC;
 using Mirror;
@@ -50,7 +51,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.0";
+        private const string Version = "1.0.1";
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
         {
@@ -183,6 +184,7 @@ namespace SCP575
 
                 Log.Debug("Changing role of dummy to SCP-106", Config.Debug);
                 hubPlayer.roleManager.ServerSetRole(RoleTypeId.Scp106, RoleChangeReason.RemoteAdmin);
+                hubPlayer.characterClassManager.GodMode = true;
                 Timing.CallDelayed(0.3f, () =>
                 {
                     Log.Debug("Moving dummy to the player's room", Config.Debug);
@@ -191,6 +193,14 @@ namespace SCP575
                     if (room.Name == RoomName.Lcz173)
                     {
                         hubPlayer.TryOverridePosition(room.ApiRoom.Position + new Vector3(0f, 13.5f, 0f), Vector3.zero);
+                    }
+                    else if (room.Name == RoomName.HczTestroom)
+                    {
+                        if (DoorVariant.DoorsByRoom.TryGetValue(room, out var hashSet))
+                        {
+                            var door = hashSet.FirstOrDefault();
+                            if (door != null) hubPlayer.TryOverridePosition(door.transform.position, Vector3.zero);
+                        }
                     }
                     else
                     {
@@ -231,27 +241,29 @@ namespace SCP575
         private Player GetVictim()
         {
             var players = new List<Player>();
-            if (Config.OnlyInHeavy)
-            {
-                foreach (var player in Player.GetPlayers())
-                {
-                    if (!player.IsSCP && player.Zone == FacilityZone.HeavyContainment)
-                    {
-                        players.Add(player);
-                    }
-                }
-            }
-            else
-            {
-                foreach (var player in Player.GetPlayers())
-                {
-                    if (!player.IsSCP && player.Zone == FacilityZone.LightContainment)
-                    {
-                        players.Add(player);
-                    }
-                }
-            }
 
+            if (Config.ActiveInLight)
+            {
+                foreach (var player in Player.GetPlayers())
+                {
+                    if (!player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.LightContainment)
+                    {
+                        players.Add(player);
+                    }
+                }
+            }
+            
+            if (Config.ActiveInHeavy)
+            {
+                foreach (var player in Player.GetPlayers())
+                {
+                    if (!player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.HeavyContainment)
+                    {
+                        players.Add(player);
+                    }
+                }
+            }
+            
             return players.Any() ? players.ElementAtOrDefault(UnityEngine.Random.Range(0, players.Count)) : null;
         }
         
