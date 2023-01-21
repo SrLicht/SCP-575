@@ -2,7 +2,7 @@
 This plugin tries to insert the SCP-575 to SCP:SL, every round there is a probability that the SCP-575 will spawn when spawning every so often a blackout will occur in LCZ or HCZ, when the blackout occurs it will take a random player that is in the blackout zone and spawn an NPC that will chase the player, if the player is touched by the SCP-575 he is eaten and killed in the process.
 
 # Features
-* Allows the SCP-575 to play sounds. This is explained in # Sounds
+* Allows the SCP-575 to play sounds. This is explained in [# Sounds](https://github.com/SrLicht/SCP-575#sounds)
 * Spawn an NPC (dummy) that will chase the player, the dummy is fully customizable in terms of mobility, name and killing range.
 * If the SCP-575 is in a lighted room for 5 seconds, it will disappear until the next blackout.
 * If the player being chased points the SCP-575 with a lighted flashlight or with a weapon that has a lighted flashlight it will add light points, when a certain number of points is reached the SCP-575 will stop chasing the player (this is configurable).
