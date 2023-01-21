@@ -10,7 +10,7 @@ This plugin tries to insert the SCP-575 to SCP:SL, every round there is a probab
 # Requirements
 This plugin only works for [NWAPI](https://github.com/northwood-studios/NwPluginAPI) 12.0 or higher.
 
-This plugin requires [SCPSLAudioApi](https://github.com/CedModV2/SCPSLAudioApi)
+This plugin uses as dependency[SCPSLAudioApi](https://github.com/CedModV2/SCPSLAudioApi)
 
 # Sounds
 This plugin allows you to make the SCP-575 play sounds of your choice, the sound files must be placed in the ``%appdata%/SCP Secret Laboratory/PluginAPI/plugins/Scp575Sounds`` folder.
