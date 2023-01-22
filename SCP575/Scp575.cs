@@ -51,7 +51,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.1";
+        private const string Version = "1.0.2";
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
         {
@@ -99,7 +99,15 @@ namespace SCP575
         {
             if (!Config.IsEnabled || _rng.Next(100) >= Config.SpawnChance) return;
             Log.Info($"SCP-575 will spawn in this round");
+            
             _blackoutHandler = Timing.RunCoroutine(Blackout());
+        }
+
+        [PluginEvent(ServerEventType.WaitingForPlayers)]
+        private void OnWaitingForPlayers()
+        {
+            if(_blackoutHandler.IsRunning)
+                Timing.KillCoroutines(_blackoutHandler);
         }
 
         /// <summary>
@@ -124,10 +132,10 @@ namespace SCP575
                 // Turn off the lights in the area
                 Extensions.FlickerLights(blackoutDuration);
                 // Spawn SCP-575
-                Spawn575(blackoutDuration - 1f);
+                Spawn575(blackoutDuration - 1.5f);
                 
                 // Decide the delay by calculating between the minimum and the maximum value.
-                yield return Timing.WaitForSeconds(_rng.Next(Config.BlackOut.MinDelay, Config.BlackOut.MaxDelay));
+                yield return Timing.WaitForSeconds(_rng.Next(Config.BlackOut.MinDelay, Config.BlackOut.MaxDelay) + blackoutDuration);
             }
 
             DestroyAllDummies();
