@@ -15,10 +15,13 @@ namespace SCP575
         [Description("Enable the Logs.Debug of SCPSLAudioApi, warning can be very spammy.")]
         public bool AudioDebug { get; set; } = false;
         
-        [Description("Blackout affects HeavyContaminet ?")]
+        [Description("Does the blackout affect Entrance Zone ?")]
+        public bool ActiveInEntrance { get; set; } = false;
+        
+        [Description("Does the blackout affect Heavy Contaiment ?")]
         public bool ActiveInHeavy { get; set; } = false;
 
-        [Description("Does the blackout affect LightContaiment ?")]
+        [Description("Does the blackout affect Light Contaiment ?")]
         public bool ActiveInLight { get; set; } = true;
 
         [Description("The per-round probability of SCP-575 appearing")]
@@ -63,7 +66,9 @@ namespace SCP575
             RoomName.LczCheckpointB,
             RoomName.HczArmory,
             RoomName.HczCheckpointA,
-            RoomName.HczCheckpointB
+            RoomName.HczCheckpointB,
+            RoomName.EzGateA,
+            RoomName.EzGateB,
         };
     }
 
@@ -92,7 +97,13 @@ namespace SCP575
 
         [Description("The volume of the sound to be reproduced by the SCP-575, high values violate the VSR.")]
         public float SoundVolume { get; set; } = 85f;
-        
+
+        [Description("Activating this will cause the SCP-575 to spawn with a delay where it will not be able to move or kill.")]
+        public bool DelayOnChase { get; set; } = true;
+
+        [Description("Delay duration where SCP-575 will not be able to do anything")]
+        public float DelayChase { get; set; } = 1.5f;
+
         [Description("The maximum distance that SCP-575 can be from its victim, remember that it must be greater than 16")]
         public float MaxDistance { get; set; } = 28f;
 

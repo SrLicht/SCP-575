@@ -9,6 +9,7 @@ using Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
 using PluginAPI.Core;
+using SCPSLAudioApi.AudioCore;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
@@ -49,6 +50,7 @@ namespace SCP575.Resources.Components
             ReferenceHub = _hub;
             _firstSpawn = true;
             _fpcScp575 = (IFpcRole)ReferenceHub.roleManager.CurrentRole;
+            _delayChase = Scp575.Instance.Config.Scp575.DelayOnChase;
             _followCoroutine = Timing.RunCoroutine(Follow().CancelWith(this).CancelWith(gameObject));
             _checksCoroutine = Timing.RunCoroutine(Checks());
         }
@@ -73,6 +75,11 @@ namespace SCP575.Resources.Components
                 // If the room where the SCP-575 is located is illuminated, it disappears.
                 if (_roomIsIlluminated) Destroy();
 
+                if (_delayChase)
+                {
+                    yield return Timing.WaitForSeconds(Scp575.Instance.Config.Scp575.DelayChase);
+                    _delayChase = false;
+                }
                 
                 // If the player has a flashlight or a weapon with a flashlight, light points are earned.
                 if (Victim.CurrentItem != null && Victim.CurrentItem is FlashlightItem { IsEmittingLight: true } || Victim.CurrentItem != null && Victim.CurrentItem is Firearm { IsEmittingLight: true})
@@ -153,6 +160,9 @@ namespace SCP575.Resources.Components
         /// </summary>
         private void OnDestroy()
         {
+            var audioPlayer = AudioPlayerBase.Get(ReferenceHub);
+            audioPlayer.Stoptrack(true);
+            
             Timing.KillCoroutines(_checksCoroutine);
             Scp575.Dummies.Remove(ReferenceHub);
             NetworkServer.Destroy(ReferenceHub.gameObject);
@@ -184,6 +194,8 @@ namespace SCP575.Resources.Components
         private bool _firstSpawn = false;
         
         private IFpcRole _fpcScp575;
+
+        private bool _delayChase = false;
         
         /// <summary>
         /// Get or set SCP-575 nickname.

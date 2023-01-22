@@ -17,6 +17,7 @@ using Respawning;
 using SCP575.Resources;
 using SCPSLAudioApi.AudioCore;
 using UnityEngine;
+using VoiceChat;
 using Extensions = SCP575.Resources.Extensions;
 using Random = System.Random;
 
@@ -51,7 +52,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.2";
+        private const string Version = "1.0.4";
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
         {
@@ -249,12 +250,13 @@ namespace SCP575
         private Player GetVictim()
         {
             var players = new List<Player>();
+            var playerList = Player.GetPlayers();
 
             if (Config.ActiveInLight)
             {
-                foreach (var player in Player.GetPlayers())
+                foreach (var player in playerList)
                 {
-                    if (!player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.LightContainment)
+                    if (player.IsAlive && !player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.LightContainment)
                     {
                         players.Add(player);
                     }
@@ -263,9 +265,20 @@ namespace SCP575
             
             if (Config.ActiveInHeavy)
             {
-                foreach (var player in Player.GetPlayers())
+                foreach (var player in playerList)
                 {
-                    if (!player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.HeavyContainment)
+                    if (player.IsAlive && !player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.HeavyContainment)
+                    {
+                        players.Add(player);
+                    }
+                }
+            }
+
+            if (Config.ActiveInEntrance)
+            {
+                foreach (var player in playerList)
+                {
+                    if (player.IsAlive && !player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.Entrance)
                     {
                         players.Add(player);
                     }

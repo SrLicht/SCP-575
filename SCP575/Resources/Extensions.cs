@@ -57,9 +57,11 @@ namespace SCP575.Resources
         /// <param name="duration">The duration in seconds of the blackout</param>
         public static void FlickerLights(float duration)
         {
+            var flickerControllerInstances = FlickerableLightController.Instances;
+            
             if (SCP575.Scp575.Instance.Config.ActiveInHeavy)
             {
-                foreach (var controller in FlickerableLightController.Instances)
+                foreach (var controller in flickerControllerInstances)
                 {
                     if (controller.Room.Zone != FacilityZone.HeavyContainment || 
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 && Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
@@ -69,9 +71,19 @@ namespace SCP575.Resources
             
             if (SCP575.Scp575.Instance.Config.ActiveInLight)
             {
-                foreach (var controller in FlickerableLightController.Instances)
+                foreach (var controller in flickerControllerInstances)
                 {
                     if (controller.Room.Zone != FacilityZone.LightContainment || 
+                        Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 && Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
+                    controller.ServerFlickerLights(duration);
+                }
+            }
+
+            if (SCP575.Scp575.Instance.Config.ActiveInEntrance)
+            {
+                foreach (var controller in flickerControllerInstances)
+                {
+                    if (controller.Room.Zone != FacilityZone.Entrance || 
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 && Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
                     controller.ServerFlickerLights(duration);
                 }
