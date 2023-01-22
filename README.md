@@ -24,6 +24,8 @@ This plugin allows you to make the SCP-575 play sounds of your choice, the sound
 * If there are several sound files, one will be chosen at random.
 * Only the player being chased hears the sounds.
 
+ I recommend using the website https://convertio.co/mp3-ogg/
+
 # Known problems
 * AI is dumb and can sometimes get stuck depending on the location.
 * SCP-575 appears in RA as a player
