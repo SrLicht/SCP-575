@@ -8,6 +8,8 @@ using MEC;
 using Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
+using PlayerRoles.PlayableScps;
+using PlayerRoles.PlayableScps.Scp106;
 using PluginAPI.Core;
 using SCPSLAudioApi.AudioCore;
 using UnityEngine;
@@ -33,11 +35,12 @@ namespace SCP575.Resources.Components
         /// MEc coroutine that handles follow of the victim.
         /// </summary>
         private CoroutineHandle _followCoroutine;
+
         /// <summary>
         /// MEc coroutine that handles checks.
         /// </summary>
         private CoroutineHandle _checksCoroutine;
-        
+
         private void Awake()
         {
             var _hub = gameObject.GetComponent<ReferenceHub>();
@@ -54,7 +57,7 @@ namespace SCP575.Resources.Components
             _followCoroutine = Timing.RunCoroutine(Follow().CancelWith(this).CancelWith(gameObject));
             _checksCoroutine = Timing.RunCoroutine(Checks());
         }
-        
+
         /// <summary>
         /// Move SCP-575 camera.
         /// </summary>
@@ -65,13 +68,13 @@ namespace SCP575.Resources.Components
             mouseLook.CurrentHorizontal = eulerAngles.y;
             mouseLook.CurrentVertical = eulerAngles.x;
         }
-        
+
         private IEnumerator<float> Follow()
         {
             for (;;)
             {
                 yield return Timing.WaitForSeconds(0.1f);
-                
+
                 // If the room where the SCP-575 is located is illuminated, it disappears.
                 if (_roomIsIlluminated) Destroy();
 
@@ -80,11 +83,13 @@ namespace SCP575.Resources.Components
                     yield return Timing.WaitForSeconds(Scp575.Instance.Config.Scp575.DelayChase);
                     _delayChase = false;
                 }
-                
+
                 // If the player has a flashlight or a weapon with a flashlight, light points are earned.
-                if (Victim.CurrentItem != null && Victim.CurrentItem is FlashlightItem { IsEmittingLight: true } || Victim.CurrentItem != null && Victim.CurrentItem is Firearm { IsEmittingLight: true})
+                if (Victim.CurrentItem != null && Victim.CurrentItem is FlashlightItem { IsEmittingLight: true } ||
+                    Victim.CurrentItem != null && Victim.CurrentItem is Firearm { IsEmittingLight: true })
                 {
-                    if(Physics.Raycast(Victim.Camera.position, Victim.Camera.transform.forward, out var hit ) && hit.collider.transform.root.gameObject == ReferenceHub.gameObject)
+                    if (Physics.Raycast(Victim.Camera.position, Victim.Camera.transform.forward, out var hit) &&
+                        hit.collider.transform.root.gameObject == ReferenceHub.gameObject)
                     {
                         _lightPoints++;
                         if (_lightPoints >= Scp575.Instance.Config.Scp575.LightPoints)
@@ -94,7 +99,7 @@ namespace SCP575.Resources.Components
                         }
                     }
                 }
-                
+
                 if (_firstSpawn)
                 {
                     // Wait for SCP-575 to spawn completely and be in the player's room.
@@ -103,11 +108,11 @@ namespace SCP575.Resources.Components
                 }
 
                 var distance = Vector3.Distance(Victim.Position, Position);
-                
+
                 if (_fpcScp575 != null)
                 {
-                    if(distance >= Scp575.Instance.Config.Scp575.MaxDistance) Destroy();
-                    else if(distance >= Scp575.Instance.Config.Scp575.MediumDistance)
+                    if (distance >= Scp575.Instance.Config.Scp575.MaxDistance) Destroy();
+                    else if (distance >= Scp575.Instance.Config.Scp575.MediumDistance)
                     {
                         var directionFast = Victim.Position - Position;
                         directionFast = directionFast.normalized;
@@ -124,9 +129,10 @@ namespace SCP575.Resources.Components
                     else if (distance <= Scp575.Instance.Config.Scp575.KillDistance)
                     {
                         Victim.Kill(Scp575.Instance.Config.Scp575.KillFeed);
-                        if(Scp575.Instance.Config.Scp575.BroadcastDuration > 0)
-                            Victim.SendBroadcast(Scp575.Instance.Config.Scp575.BroadcastKill, Scp575.Instance.Config.Scp575.BroadcastDuration);
-                        
+                        if (Scp575.Instance.Config.Scp575.BroadcastDuration > 0)
+                            Victim.SendBroadcast(Scp575.Instance.Config.Scp575.BroadcastKill,
+                                Scp575.Instance.Config.Scp575.BroadcastDuration);
+
                         Log.Info($"SCP-575 kill player {Victim.Nickname} ({Victim.UserId})");
                         Destroy();
                     }
@@ -147,14 +153,14 @@ namespace SCP575.Resources.Components
             for (;;)
             {
                 yield return Timing.WaitForSeconds(5.0f);
-                
-                if(!Victim.IsAlive) Destroy();
+
+                if (!Victim.IsAlive) Destroy();
 
                 cachedScp575Room = Scp575Room;
                 _roomIsIlluminated = Extensions.IsRoomIlluminated(cachedScp575Room);
             }
         }
-        
+
         /// <summary>
         /// Called when destroying the component
         /// </summary>
@@ -162,7 +168,7 @@ namespace SCP575.Resources.Components
         {
             var audioPlayer = AudioPlayerBase.Get(ReferenceHub);
             audioPlayer.Stoptrack(true);
-            
+
             Timing.KillCoroutines(_checksCoroutine);
             Scp575.Dummies.Remove(ReferenceHub);
             NetworkServer.Destroy(ReferenceHub.gameObject);
@@ -185,18 +191,19 @@ namespace SCP575.Resources.Components
             Log.Debug($"Calling Destroy in {destroyTimer}", Scp575.Instance.Config.Debug);
             Destroy(this, destroyTimer);
         }
-        
+
         #region API and private variables
+
         // I dont want to use NWAPI for the NCP soo..
 
         private int _lightPoints = 0;
 
         private bool _firstSpawn = false;
-        
+
         private IFpcRole _fpcScp575;
 
         private bool _delayChase = false;
-        
+
         /// <summary>
         /// Get or set SCP-575 nickname.
         /// </summary>
@@ -205,7 +212,7 @@ namespace SCP575.Resources.Components
             get => ReferenceHub.nicknameSync._myNickSync;
             set => ReferenceHub.nicknameSync.MyNick = value;
         }
-        
+
         /// <summary>
         /// Obtain the current room of SCP-575
         /// </summary>
@@ -215,12 +222,12 @@ namespace SCP575.Resources.Components
         /// To avoid killing the server by making calls every Frame, I will save the last room in a cache that refreshes every 5 seconds.
         /// </summary>
         public RoomIdentifier cachedScp575Room;
-        
+
         /// <summary>
         /// Every 5 seconds I will update if the current room has the lights on
         /// </summary>
         private bool _roomIsIlluminated = false;
-        
+
         /// <summary>
         /// Get or set SCP-575 god mode.
         /// </summary>
@@ -229,7 +236,7 @@ namespace SCP575.Resources.Components
             get => ReferenceHub.characterClassManager.GodMode;
             set => ReferenceHub.characterClassManager.GodMode = value;
         }
-        
+
         /// <summary>
         /// Get or set SCP-575 current scale.
         /// </summary>
@@ -253,7 +260,7 @@ namespace SCP575.Resources.Components
                 }
             }
         }
-        
+
         /// <summary>
         /// Get or set SCP-575 position.
         /// </summary>

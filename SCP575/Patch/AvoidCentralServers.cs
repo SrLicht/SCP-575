@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
 using NorthwoodLib.Pools;
+
 namespace SCP575.Patch
 {
     /// <summary>
