@@ -21,15 +21,15 @@ namespace SCP575.Resources
             return files?.Length > 0 && files.FirstOrDefault(a => a.EndsWith(".ogg")) != null;
         }
 
+        /// <summary>
+        /// Checks if the player is in a room that is on the blacklist.
+        /// </summary>
         public static bool IsInInvalidRoom(this Player ply)
         {
-            if (Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 1 &&
-                Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(ply.Room.Name))
-            {
-                return true;
-            }
+            if (ply.Room is null) return false;
 
-            return false;
+            return Scp575.Instance.Config.BlackOut.BlackListRooms != null &&
+                   Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(ply.Room.Name);
         }
 
         /// <summary>

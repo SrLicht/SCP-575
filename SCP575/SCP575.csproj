@@ -7,40 +7,41 @@
         <PackageId>SCP575</PackageId>
     </PropertyGroup>
 
-    <Import Project="../Cerberus.props"/>
+    <Import Project="../Cerberus.props" />
 
     <ItemGroup>
-        <Compile Remove="Properties\**"/>
-        <EmbeddedResource Remove="Properties\**"/>
-        <None Remove="Properties\**"/>
+        <Compile Remove="Properties\**" />
+        <EmbeddedResource Remove="Properties\**" />
+        <None Remove="Properties\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="app.config"/>
-        <None Remove="FodyWeavers.xml"/>
-        <None Remove="packages.config"/>
+        <None Remove="app.config" />
+        <None Remove="FodyWeavers.xml" />
+        <None Remove="packages.config" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
-        <PackageReference Include="Nito.AsyncEx.Tasks" Version="5.1.2"/>
-        <PackageReference Include="Northwood.PluginAPI" Version="12.0.0"/>
-        <PackageReference Include="Northwood.PluginAPI.Analyzers" Version="12.0.0"/>
-        <PackageReference Include="YamlDotNet" Version="12.3.1"/>
-        <PackageReference Include="Lib.Harmony" Version="2.2.2"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+        <PackageReference Include="Nito.AsyncEx.Tasks" Version="5.1.2" />
+        <PackageReference Include="Northwood.PluginAPI" Version="12.0.0" />
+        <PackageReference Include="Northwood.PluginAPI.Analyzers" Version="12.0.0" />
+        <PackageReference Include="YamlDotNet" Version="12.3.1" />
+        <PackageReference Include="Lib.Harmony" Version="2.2.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="Assembly-CSharp" HintPath="$(SL_REFERENCES)\Assembly-CSharp-Publicized.dll" Private="false"/>
-        <Reference Include="Assembly-CSharp-firstpass" HintPath="$(SL_REFERENCES)\Assembly-CSharp-firstpass.dll" Private="false"/>
-        <Reference Include="CommandSystem.Core" HintPath="$(SL_REFERENCES)\CommandSystem.Core.dll" Private="false"/>
-        <Reference Include="Mirror" HintPath="$(SL_REFERENCES)\Mirror.dll" Private="false"/>
-        <Reference Include="System.Core" HintPath="$(SL_REFERENCES)\System.Core.dll" Private="false"/>
-        <Reference Include="UnityEngine" HintPath="$(SL_REFERENCES)\UnityEngine.dll" Private="false"/>
-        <Reference Include="SCPSLAudioApi" HintPath="$(SL_REFERENCES)\SCPSLAudioApi.dll" Private="false"/>
-        <Reference Include="NorthwoodLib" HintPath="$(SL_REFERENCES)\NorthwoodLib.dll" Private="false"/>
-        <Reference Include="UnityEngine.CoreModule" HintPath="$(SL_REFERENCES)\UnityEngine.CoreModule.dll" Private="false"/>
-        <Reference Include="UnityEngine.PhysicsModule" HintPath="$(SL_REFERENCES)\UnityEngine.PhysicsModule.dll" Private="false"/>
-        <Reference Include="NWAPIPermissionSystem" HintPath="$(SL_REFERENCES)\NWAPIPermissionSystem.dll" Private="false"/>
+        <Reference Include="Assembly-CSharp" HintPath="$(SL_REFERENCES)\Assembly-CSharp-Publicized.dll" Private="false" />
+        <Reference Include="Assembly-CSharp-firstpass" HintPath="$(SL_REFERENCES)\Assembly-CSharp-firstpass.dll" Private="false" />
+        <Reference Include="CommandSystem.Core" HintPath="$(SL_REFERENCES)\CommandSystem.Core.dll" Private="false" />
+        <Reference Include="Mirror" HintPath="$(SL_REFERENCES)\Mirror.dll" Private="false" />
+        <Reference Include="UnityEngine.AIModule" HintPath="$(SL_REFERENCES)\UnityEngine.AIModule.dll" Private="false" />
+        <Reference Include="System.Core" HintPath="$(SL_REFERENCES)\System.Core.dll" Private="false" />
+        <Reference Include="UnityEngine" HintPath="$(SL_REFERENCES)\UnityEngine.dll" Private="false" />
+        <Reference Include="SCPSLAudioApi" HintPath="$(SL_REFERENCES)\SCPSLAudioApi.dll" Private="false" />
+        <Reference Include="NorthwoodLib" HintPath="$(SL_REFERENCES)\NorthwoodLib.dll" Private="false" />
+        <Reference Include="UnityEngine.CoreModule" HintPath="$(SL_REFERENCES)\UnityEngine.CoreModule.dll" Private="false" />
+        <Reference Include="UnityEngine.PhysicsModule" HintPath="$(SL_REFERENCES)\UnityEngine.PhysicsModule.dll" Private="false" />
+        <Reference Include="NWAPIPermissionSystem" HintPath="$(SL_REFERENCES)\NWAPIPermissionSystem.dll" Private="false" />
     </ItemGroup>
 </Project>

@@ -52,7 +52,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.5";
+        private const string Version = "1.0.6";
 
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
@@ -244,7 +244,7 @@ namespace SCP575
             }
             catch (Exception e)
             {
-                Log.Error($"Error on {nameof(Spawn575)}: {e.Data} -- {e.StackTrace}");
+                Log.Error($"Error on {nameof(Spawn575)}: {e} -- {e.StackTrace}");
             }
         }
 
