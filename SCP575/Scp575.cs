@@ -52,7 +52,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.6";
+        private const string Version = "1.0.7";
 
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
@@ -244,7 +244,7 @@ namespace SCP575
             }
             catch (Exception e)
             {
-                Log.Error($"Error on {nameof(Spawn575)}: {e} -- {e.StackTrace}");
+                Log.Error($"Error on {nameof(Spawn575)}: {e} -- {e.Message}");
             }
         }
 
@@ -254,49 +254,66 @@ namespace SCP575
         /// <returns></returns>
         private Player GetVictim()
         {
-            var players = new List<Player>();
-            var playerList = Player.GetPlayers();
-
-            if (Config.ActiveInLight)
+            try
             {
-                foreach (var player in playerList)
-                {
-                    if (player.IsAlive && !player.IsSCP && !player.IsTutorial &&
-                        player.Zone == FacilityZone.LightContainment
-                        && !player.IsInInvalidRoom())
+                var players = new List<Player>();
+                var playerList = Player.GetPlayers();
 
+                if (Config.ActiveInLight)
+                {
+                    foreach (var player in playerList)
                     {
-                        players.Add(player);
+                        if (player?.Room is null) continue;
+                        
+                        if (player.IsAlive && !player.IsSCP && !player.IsTutorial &&
+                            player.Zone == FacilityZone.LightContainment
+                            && !player.IsInInvalidRoom())
+
+                        {
+                            players.Add(player);
+                        }
                     }
                 }
-            }
 
-            if (Config.ActiveInHeavy)
-            {
-                foreach (var player in playerList)
+                if (Config.ActiveInHeavy)
                 {
-                    if (player.IsAlive && !player.IsSCP && !player.IsTutorial &&
-                        player.Zone == FacilityZone.HeavyContainment
-                        && !player.IsInInvalidRoom())
+                    foreach (var player in playerList)
                     {
-                        players.Add(player);
+                        if (player?.Room is null) continue;
+                        
+                        if (player.IsAlive && !player.IsSCP && !player.IsTutorial &&
+                            player.Zone == FacilityZone.HeavyContainment
+                            && !player.IsInInvalidRoom())
+                        {
+                            players.Add(player);
+                        }
                     }
                 }
-            }
 
-            if (Config.ActiveInEntrance)
-            {
-                foreach (var player in playerList)
+                if (!Config.ActiveInEntrance)
+                    return players.Any()
+                        ? players.ElementAtOrDefault(UnityEngine.Random.Range(0, players.Count))
+                        : null;
                 {
-                    if (player.IsAlive && !player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.Entrance
-                        && !player.IsInInvalidRoom())
+                    foreach (var player in playerList)
                     {
-                        players.Add(player);
+                        if (player?.Room is null) continue;
+                        
+                        if (player.IsAlive && !player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.Entrance
+                            && !player.IsInInvalidRoom())
+                        {
+                            players.Add(player);
+                        }
                     }
                 }
-            }
 
-            return players.Any() ? players.ElementAtOrDefault(UnityEngine.Random.Range(0, players.Count)) : null;
+                return players.Any() ? players.ElementAtOrDefault(UnityEngine.Random.Range(0, players.Count)) : null;
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Error on {nameof(GetVictim)}: {e} -- {e.Message}");
+                return null;
+            }
         }
 
         /// <summary>
