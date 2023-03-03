@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using MapGeneration;
+using PlayerRoles;
 
 namespace SCP575
 {
@@ -38,6 +39,15 @@ namespace SCP575
     {
         [Description("After this time, the constant blackouts will begin to be executed.")]
         public float InitialDelay { get; set; } = 300f;
+        
+        [Description("If this value is true initial_delay will be ignored and a calculation will be made between initial_max_delay and initial_min_delay which will result in the delay")]
+        public bool RandomInitialDelay { get; set; } = false;
+        
+        [Description("The maximum time that the main delay can have")]
+        public float InitialMaxDelay { get; set; } = 250f;
+
+        [Description("The minimun time that the main delay can have")]
+        public float InitialMinDelay { get; set; } = 190f;
 
         [Description("The minimum duration of a blackout")]
         public float MinDuration { get; set; } = 30f;
@@ -82,6 +92,9 @@ namespace SCP575
 
         [Description("The distance at which players can see the name of the SCP-575 | The game default value is 10")]
         public int ViewRange { get; set; } = 12;
+
+        [Description("Set the SCP-575 role, by default is SCP-106")]
+        public RoleTypeId RoleType { get; set; } = RoleTypeId.Scp106;
 
         [Description("The death message that will appear when players are killed by SCP-575")]
         public string KillFeed { get; set; } = "Devoured by SCP-575";

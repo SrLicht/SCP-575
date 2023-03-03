@@ -52,7 +52,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.7";
+        private const string Version = "1.0.8";
 
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
@@ -117,7 +117,14 @@ namespace SCP575
         /// <returns></returns>
         private IEnumerator<float> Blackout()
         {
-            yield return Timing.WaitForSeconds(Config.BlackOut.InitialDelay);
+            if (Config.BlackOut.RandomInitialDelay)
+            {
+                yield return Timing.WaitForSeconds(_rng.Next((int)Config.BlackOut.InitialMinDelay, (int)Config.BlackOut.InitialMaxDelay));
+            }
+            else
+            {
+                yield return Timing.WaitForSeconds(Config.BlackOut.InitialDelay);
+            }
 
             while (Round.IsRoundStarted)
             {
@@ -125,8 +132,10 @@ namespace SCP575
                 var blackoutDuration =
                     (float)_rng.NextDouble() * (Config.BlackOut.MaxDuration - Config.BlackOut.MinDuration) +
                     Config.BlackOut.MinDuration;
+                
                 // Send Cassie's message to everyone
                 RespawnEffectsController.PlayCassieAnnouncement(Config.BlackOut.CassieMessage, false, true);
+                
                 // Wait for Cassie to finish speaking
                 yield return Timing.WaitForSeconds(Config.BlackOut.DelayAfterCassie);
 
@@ -194,8 +203,17 @@ namespace SCP575
                     // ignored
                 }
 
-                Log.Debug("Changing role of dummy to SCP-106", Config.Debug);
-                hubPlayer.roleManager.ServerSetRole(RoleTypeId.Scp106, RoleChangeReason.RemoteAdmin);
+                Log.Debug($"Changing role of dummy to {Config.Scp575.RoleType}", Config.Debug);
+
+                try
+                {
+                    hubPlayer.roleManager.ServerSetRole(Config.Scp575.RoleType, RoleChangeReason.RemoteAdmin);
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Error on {nameof(Spawn575)}: Error on set dummy role {e}");
+                }
+                
                 hubPlayer.characterClassManager.GodMode = true;
 
                 Timing.CallDelayed(0.3f, () =>
