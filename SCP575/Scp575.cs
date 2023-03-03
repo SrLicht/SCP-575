@@ -250,7 +250,7 @@ namespace SCP575
 
                 if (!Config.Scp575.PlaySounds) return;
                 if (!Extensions.AudioFileExist()) Log.Error($"There is no .ogg file in the folder {AudioPath}");
-                var audioPlayer = AudioPlayerBase.Get(hubPlayer);
+                var audioPlayer = Scp575AudioPlayer.Get(hubPlayer);
                 var audioFile = Extensions.GetAudioFilePath();
                 audioPlayer.Enqueue(audioFile, -1);
                 audioPlayer.LogDebug = Config.AudioDebug;

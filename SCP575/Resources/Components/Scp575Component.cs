@@ -166,7 +166,7 @@ namespace SCP575.Resources.Components
         /// </summary>
         private void OnDestroy()
         {
-            var audioPlayer = AudioPlayerBase.Get(ReferenceHub);
+            var audioPlayer = Scp575AudioPlayer.Get(ReferenceHub);
             audioPlayer.Stoptrack(true);
 
             Timing.KillCoroutines(_checksCoroutine);
