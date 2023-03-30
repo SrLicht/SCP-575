@@ -1,7 +1,7 @@
 ![Github All Releases](https://img.shields.io/github/downloads/SrLicht/SCP-575/total.svg)   <a href="https://github.com/SrLicht/SCP-575/releases"><img src="https://img.shields.io/github/v/release/SrLicht/SCP-575?include_prereleases&label=Last Release" alt="Releases"></a> 
 
 # What does this do?
-This plugin tries to insert the SCP-575 to SCP:SL, every round there is a probability that the SCP-575 will spawn when spawning every so often a blackout will occur in LCZ or HCZ, when the blackout occurs it will take a random player that is in the blackout zone and spawn an NPC that will chase the player, if the player is touched by the SCP-575 he is eaten and killed in the process.
+This plugin inserts the SCP-575 in SCP:SL, every round there is a probability that the SCP-575 spawns, if it spawns in LCZ, HCZ and EZ (configurable) there will be blackouts, the players that are in the blackout zones are likely to meet the SCP-575, the SCP-575 will start chasing them, if the 575 touches them the players will be devoured and the SCP-575 will disappear for now. It is possible to make SCP-575 disappear by pointing a flashlight at it or by going to a lighted area.
 
 # Features
 * Allows the SCP-575 to play sounds. This is explained in [# Sounds](https://github.com/SrLicht/SCP-575#sounds)
@@ -29,6 +29,7 @@ This plugin allows you to make the SCP-575 play sounds of your choice, the sound
 # Known problems
 * AI is dumb and can sometimes get stuck depending on the location.
 * SCP-575 appears in RA as a player
+* Lazy programmer
 
 # Gameplay videos
 Don't expect high quality, I compressed the videos.
@@ -56,14 +57,28 @@ is_enabled: true
 debug: false
 # Enable the Logs.Debug of SCPSLAudioApi, warning can be very spammy.
 audio_debug: false
-# SCP-575 works only in HeavyContainment ? enabling this setting causes the SCP-575 to no longer appear in LightContainment.
-only_in_heavy: false
+# Does the blackout affect Entrance Zone ?
+active_in_entrance: false
+# Does the blackout affect Heavy Contaiment ?
+active_in_heavy: false
+# Does the blackout affect Light Contaiment ?
+active_in_light: true
 # The per-round probability of SCP-575 appearing
 spawn_chance: 40
+# If there is an SCP-173 in the round, SCP-575 will deactivate for that round.
+disable_for_scp173: false
+# An alternative to the above is this, that when there is an SCP-173 in the Light Containment zone round it will never blackout. YOU CANNOT ACTIVATE BOTH OPTIONS THE PLUGIN WILL BE BROKEN
+disable_blackout_for_scp173: false
 # All blackout related configuration
 black_out:
 # After this time, the constant blackouts will begin to be executed.
   initial_delay: 300
+  # If this value is true initial_delay will be ignored and a calculation will be made between initial_max_delay and initial_min_delay which will result in the delay
+  random_initial_delay: false
+  # The maximum time that the main delay can have
+  initial_max_delay: 250
+  # The minimun time that the main delay can have
+  initial_min_delay: 190
   # The minimum duration of a blackout
   min_duration: 30
   # The maximum duration of a blackout
@@ -74,20 +89,31 @@ black_out:
   max_delay: 400
   # Before starting the blackout Cassie will say this message
   cassie_message: facility power system failure in 3 . pitch_.80 2 . pitch_.60 1 . pitch_.49 . .g1 pitch_.42  .g2 pitch_.31  .g5
+  # I have no idea what it does
+  cassie_is_hold: false
+  # Enable o disable bells in cassie announcement
+  cassie_is_noise: true
   # After making Cassie's announcement the blackout will start after these seconds, perfect to turn off the lights just when the announcement ends.
   delay_after_cassie: 8.5
   # List of rooms where the light will not turn off, the SCP-575 will disappear if you touch these rooms for 5 seconds. If you want a list of Rooms see the Readme of the plugin repository
   black_list_rooms:
   - Lcz914
   - LczArmory
+  - LczCheckpointA
+  - LczCheckpointB
+  - HczArmory
+  - HczCheckpointA
+  - HczCheckpointB
+  - EzGateA
+  - EzGateB
 # All configuration related to the SCP-575
 scp575:
-# The name that SCP-575 will have as a player
+# The name the dummy will have
   nickname: SCP-575-B
-  # The information players will see when approaching SCP-575
-  custom_info: SCP-575
   # The distance at which players can see the name of the SCP-575 | The game default value is 10
   view_range: 12
+  # Set the SCP-575 role, by default is SCP-106
+  role_type: Scp106
   # The death message that will appear when players are killed by SCP-575
   kill_feed: Devoured by SCP-575
   # The broadcast that will be sent to the player when killed by SCP-575
@@ -98,6 +124,10 @@ scp575:
   play_sounds: false
   # The volume of the sound to be reproduced by the SCP-575, high values violate the VSR.
   sound_volume: 85
+  # Activating this will cause the SCP-575 to spawn with a delay where it will not be able to move or kill.
+  delay_on_chase: true
+  # Delay duration where SCP-575 will not be able to do anything
+  delay_chase: 1.5
   # The maximum distance that SCP-575 can be from its victim, remember that it must be greater than 16
   max_distance: 28
   # If the distance is equal to or greater than this value, the speed that is movement_speed_fast will be applied to the SCP-575.
@@ -114,6 +144,7 @@ scp575:
   light_points: 85
   # When a player makes SCP-575 disappear using the LightPoints, this message will be sent to the player.
   light_point_kill_message: SCP-575 disappears for now
+
 ```
 
 **Rooms**
