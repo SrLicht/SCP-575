@@ -28,6 +28,12 @@ namespace SCP575
         [Description("The per-round probability of SCP-575 appearing")]
         public int SpawnChance { get; set; } = 40;
 
+        [Description("If there is an SCP-173 in the round, SCP-575 will deactivate for that round.")]
+        public bool DisableForScp173 { get; set; } = false;
+
+        [Description("An alternative to the above configuration, if there is a SCP-173 in the light contaiment zone round it will never suffer a blackout. DO NOT ACTIVATE BOTH AT THE SAME TIME")]
+        public bool DisableBlackoutForScp173 { get; set; } = false;
+
         [Description("All blackout related configuration")]
         public BlackoutConfig BlackOut { get; set; } = new BlackoutConfig();
 
@@ -64,6 +70,12 @@ namespace SCP575
         [Description("Before starting the blackout Cassie will say this message")]
         public string CassieMessage { get; set; } =
             "facility power system failure in 3 . pitch_.80 2 . pitch_.60 1 . pitch_.49 . .g1 pitch_.42  .g2 pitch_.31  .g5";
+
+        [Description("I have no idea what it does")]
+        public bool CassieIsHold { get; set; } = false;
+        
+        [Description("Enable o disable bells in cassie announcement")]
+        public bool CassieIsNoise { get; set; } = true;
 
         [Description(
             "After making Cassie's announcement the blackout will start after these seconds, perfect to turn off the lights just when the announcement ends.")]

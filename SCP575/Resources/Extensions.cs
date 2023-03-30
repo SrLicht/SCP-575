@@ -67,7 +67,7 @@ namespace SCP575.Resources
         /// Turns off the lights in the specified zone, for a period of time.
         /// </summary>
         /// <param name="duration">The duration in seconds of the blackout</param>
-        public static void FlickerLights(float duration)
+        public static void FlickerLights(float duration, bool antiScp173 = false)
         {
             var flickerControllerInstances = FlickerableLightController.Instances;
 
@@ -84,12 +84,15 @@ namespace SCP575.Resources
 
             if (SCP575.Scp575.Instance.Config.ActiveInLight)
             {
-                foreach (var controller in flickerControllerInstances)
+                if (!antiScp173)
                 {
-                    if (controller.Room.Zone != FacilityZone.LightContainment ||
-                        Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
-                        Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
-                    controller.ServerFlickerLights(duration);
+                    foreach (var controller in flickerControllerInstances)
+                    {
+                        if (controller.Room.Zone != FacilityZone.LightContainment ||
+                            Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
+                            Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
+                        controller.ServerFlickerLights(duration);
+                    }
                 }
             }
 
@@ -105,6 +108,11 @@ namespace SCP575.Resources
             }
         }
 
+        /// <summary>
+        /// Check if the current room is with the lights on.
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <returns></returns>
         public static bool IsRoomIlluminated(RoomIdentifier roomId)
         {
             var lightController = roomId.GetComponentInChildren<FlickerableLightController>();

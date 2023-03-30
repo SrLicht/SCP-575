@@ -52,14 +52,13 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.8";
+        private const string Version = "1.0.9";
 
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
         {
             try
             {
-                SCPSLAudioApi.Startup.SetupDependencies();
                 Instance = this;
                 if (!Config.IsEnabled) return;
                 Extensions.CreateDirectory();
@@ -102,6 +101,20 @@ namespace SCP575
             Log.Info($"SCP-575 will spawn in this round");
 
             _blackoutHandler = Timing.RunCoroutine(Blackout());
+
+            if (Config.DisableForScp173)
+            {
+                Timing.CallDelayed(10, () =>
+                {
+                    foreach (var player in Player.GetPlayers())
+                    {
+                        if (player.Role == RoleTypeId.Scp173)
+                        {
+                            Timing.KillCoroutines(_blackoutHandler);
+                        }
+                    }
+                });
+            }
         }
 
         [PluginEvent(ServerEventType.WaitingForPlayers)]
@@ -134,16 +147,29 @@ namespace SCP575
                     Config.BlackOut.MinDuration;
                 
                 // Send Cassie's message to everyone
-                RespawnEffectsController.PlayCassieAnnouncement(Config.BlackOut.CassieMessage, false, true);
+                RespawnEffectsController.PlayCassieAnnouncement(Config.BlackOut.CassieMessage, Config.BlackOut.CassieIsHold, Config.BlackOut.CassieIsNoise);
                 
                 // Wait for Cassie to finish speaking
                 yield return Timing.WaitForSeconds(Config.BlackOut.DelayAfterCassie);
 
-                // Spawn SCP-575
-                Spawn575(blackoutDuration);
+                try
+                {
+                    // Spawn SCP-575
+                    Spawn575(blackoutDuration);
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Error on {nameof(Spawn575)}: {e}");
+                }
+
+                var antiScp173 = false;
+                if (Config.DisableBlackoutForScp173)
+                {
+                    antiScp173 = GetScp173();
+                }
 
                 // Turn off the lights in the area
-                Extensions.FlickerLights(blackoutDuration);
+                Extensions.FlickerLights(blackoutDuration, antiScp173);
 
                 // Decide the delay by calculating between the minimum and the maximum value.
                 yield return Timing.WaitForSeconds(_rng.Next(Config.BlackOut.MinDelay, Config.BlackOut.MaxDelay) +
@@ -343,6 +369,25 @@ namespace SCP575
             {
                 NetworkServer.Destroy(dummy.gameObject);
             }
+        }
+
+        /// <summary>
+        /// Get if in the round exist a SCP-173
+        /// </summary>
+        /// <returns>boolean indicating if exist a SCP-173 in the round</returns>
+        private bool GetScp173()
+        {
+            var value = false;
+
+            foreach (var player in Player.GetPlayers())
+            {
+                if (player.Role == RoleTypeId.Scp173)
+                {
+                    value = true;
+                }
+            }
+
+            return value;
         }
     }
 }
