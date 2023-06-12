@@ -39,6 +39,9 @@ namespace SCP575
 
         [Description("All configuration related to the SCP-575")]
         public Scp575Config Scp575 { get; set; } = new Scp575Config();
+
+        [Description("Here you can translate the responses given by the command when executed, unfortunately due to NWAPI limitations I cannot give a configuration to change the command description.")]
+        public ResponseCommandConfig CommandResponses { get; set; } = new ResponseCommandConfig();
     }
 
     public class BlackoutConfig
@@ -162,5 +165,19 @@ namespace SCP575
         [Description(
             "When a player makes SCP-575 disappear using the LightPoints, this message will be sent to the player.")]
         public string LightPointKillMessage { get; set; } = "SCP-575 disappears for now";
+    }
+
+    public class ResponseCommandConfig
+    {
+        public string RoundHasNotStarted { get; set; } = "You cannot use this command if the round has not started.";
+
+        public string InvalidPlayerId { get; set; } = "{0} is not an valid player id";
+        public string PlayerNotFound { get; set; } = "Player not found";
+
+        public string InvalidDuration { get; set; } = "{0} is not an valid duration";
+
+        public string Spawning { get; set; } = "Spawning a SCP-575 to hunt {0}";
+
+        public string HelpResponse { get; set; } = "Correct use of the command {0}\nPlayer ID | It is a numerical ID that changes with each new round and each time someone connects to the server again.\nDuration | The time (in seconds) that the SCP-575 will hunt someone";
     }
 }
