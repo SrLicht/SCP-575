@@ -166,12 +166,18 @@ namespace SCP575.Resources.Components
         /// </summary>
         private void OnDestroy()
         {
-            var audioPlayer = Scp575AudioPlayer.Get(ReferenceHub);
-            audioPlayer.Stoptrack(true);
+            var audioPlayer = DummyAudioPlayer.Get(ReferenceHub);
 
-            Timing.KillCoroutines(_checksCoroutine);
-            Scp575.Dummies.Remove(ReferenceHub);
-            NetworkServer.Destroy(ReferenceHub.gameObject);
+            if(audioPlayer != null)
+            {
+                audioPlayer.Stoptrack(true);
+                DummyAudioPlayer.Remove(ReferenceHub);
+            }
+            
+            Timing.CallDelayed(0.5f, () =>
+            {
+                Dummies.DestroyDummy(ReferenceHub);
+            });
         }
 
         /// <summary>
