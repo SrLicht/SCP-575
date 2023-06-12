@@ -36,11 +36,6 @@ namespace SCP575
         public readonly string AudioPath = Path.Combine($"{Paths.Plugins}", "Scp575Sounds");
 
         /// <summary>
-        /// List of dummies.
-        /// </summary>
-        public static List<ReferenceHub> Dummies = new();
-
-        /// <summary>
         /// Harmony Instance.
         /// </summary>
         private Harmony _harmonyInstance;
@@ -52,7 +47,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.0.9";
+        private const string Version = "1.1.0";
 
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
@@ -86,9 +81,7 @@ namespace SCP575
             _harmonyInstance.UnpatchAll();
             _harmonyInstance = null;
             _rng = null;
-            DestroyAllDummies();
-            Dummies.Clear();
-            Dummies = null;
+            Dummies.ClearAllDummies();
             Instance = null;
         }
 
@@ -176,7 +169,7 @@ namespace SCP575
                                                    blackoutDuration);
             }
 
-            DestroyAllDummies();
+            Dummies.ClearAllDummies();
         }
 
         /// <summary>
@@ -195,34 +188,16 @@ namespace SCP575
                     return;
                 }
 
-                Log.Debug("Creating Dummy", Config.Debug);
-
-                #region Create Dummy
-
-                var newPlayer =
-                    UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
-                int id = Dummies.Count;
-                var fakeConnection = new FakeConnection(id++);
-                var hubPlayer = newPlayer.GetComponent<ReferenceHub>();
-
-                #endregion
-
-                Log.Debug("Adding dummy to the list of dummies", Config.Debug);
-                Dummies.Add(hubPlayer);
-                Log.Debug("Spawning dummy", Config.Debug);
-                NetworkServer.AddPlayerForConnection(fakeConnection, newPlayer);
-
-                Log.Debug("Setting the UserId of the dummy", Config.Debug);
-                hubPlayer.characterClassManager._privUserId = $"SCP-575-{id}@server";
-                hubPlayer.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
+                var scp575 = Dummies.CreateDummy("Scp575", "SCP-575");
 
                 try
                 {
                     Log.Debug("Applying nickname", Config.Debug);
-                    hubPlayer.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
-                    hubPlayer.nicknameSync.ViewRange = Config.Scp575.ViewRange;
+                    scp575.ReferenceHub.nicknameSync.ShownPlayerInfo &= ~PlayerInfoArea.Role;
+
+                    scp575.ReferenceHub.nicknameSync.ViewRange = Config.Scp575.ViewRange;
                     // SetNick it will always give an error but will apply it anyway.
-                    hubPlayer.nicknameSync.SetNick(Config.Scp575.Nickname);
+                    scp575.Nickname = Config.Scp575.Nickname;
                 }
                 catch (Exception)
                 {
@@ -233,14 +208,14 @@ namespace SCP575
 
                 try
                 {
-                    hubPlayer.roleManager.ServerSetRole(Config.Scp575.RoleType, RoleChangeReason.RemoteAdmin);
+                    scp575.Role = Config.Scp575.RoleType;
                 }
                 catch (Exception e)
                 {
                     Log.Error($"Error on {nameof(Spawn575)}: Error on set dummy role {e}");
                 }
-                
-                hubPlayer.characterClassManager.GodMode = true;
+
+                scp575.IsGodModeEnabled = true;
 
                 Timing.CallDelayed(0.3f, () =>
                 {
@@ -250,33 +225,30 @@ namespace SCP575
 
                     if (room.Name == RoomName.Lcz173)
                     {
-                        hubPlayer.TryOverridePosition(room.ApiRoom.Position + new Vector3(0f, 13.5f, 0f), Vector3.zero);
+                        scp575.Position = room.ApiRoom.Position + new Vector3(0f, 13.5f, 0f);
                     }
                     else if (room.Name == RoomName.HczTestroom)
                     {
                         if (DoorVariant.DoorsByRoom.TryGetValue(room, out var hashSet))
                         {
                             var door = hashSet.FirstOrDefault();
-                            if (door != null) hubPlayer.TryOverridePosition(door.transform.position, Vector3.zero);
+                            if (door != null) scp575.Position = door.transform.position + Vector3.up;
                         }
                     }
                     else
                     {
-                        hubPlayer.TryOverridePosition(room.ApiRoom.Position + new Vector3(0f, 1.3f, 0f), Vector3.zero);
+                        scp575.Position = room.ApiRoom.Position + Vector3.up;
                     }
                 });
 
                 Log.Debug("Adding SCP-575 component", Config.Debug);
-                hubPlayer.gameObject.AddComponent<Resources.Components.Scp575Component>().Victim = victim;
-
-                if (hubPlayer.gameObject.TryGetComponent<Resources.Components.Scp575Component>(out var comp))
-                {
-                    comp.Destroy(duration);
-                }
+                var comp = scp575.GameObject.AddComponent<Resources.Components.Scp575Component>();
+                comp.Victim = victim;
+                comp.Destroy(duration);
 
                 if (!Config.Scp575.PlaySounds) return;
                 if (!Extensions.AudioFileExist()) Log.Error($"There is no .ogg file in the folder {AudioPath}");
-                var audioPlayer = Scp575AudioPlayer.Get(hubPlayer);
+                var audioPlayer = DummyAudioPlayer.Get(scp575.ReferenceHub);
                 var audioFile = Extensions.GetAudioFilePath();
                 audioPlayer.Enqueue(audioFile, -1);
                 audioPlayer.LogDebug = Config.AudioDebug;
@@ -357,17 +329,6 @@ namespace SCP575
             {
                 Log.Error($"Error on {nameof(GetVictim)}: {e} -- {e.Message}");
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// Destroy all dummies in the list.
-        /// </summary>
-        private void DestroyAllDummies()
-        {
-            foreach (var dummy in Dummies)
-            {
-                NetworkServer.Destroy(dummy.gameObject);
             }
         }
 
