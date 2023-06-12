@@ -60,7 +60,7 @@ namespace SCP575.Resources
         /// </summary>
         public static bool IsDummy(ReferenceHub hub)
         {
-            return Scp575.Dummies.Contains(hub);
+            return Dummies.AllDummies.Contains(hub);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace SCP575.Resources
         {
             var flickerControllerInstances = FlickerableLightController.Instances;
 
-            if (SCP575.Scp575.Instance.Config.ActiveInHeavy)
+            if (Scp575.Instance.Config.ActiveInHeavy)
             {
                 foreach (var controller in flickerControllerInstances)
                 {
@@ -82,7 +82,7 @@ namespace SCP575.Resources
                 }
             }
 
-            if (SCP575.Scp575.Instance.Config.ActiveInLight)
+            if (Scp575.Instance.Config.ActiveInLight)
             {
                 if (!antiScp173)
                 {
@@ -96,7 +96,7 @@ namespace SCP575.Resources
                 }
             }
 
-            if (SCP575.Scp575.Instance.Config.ActiveInEntrance)
+            if (Scp575.Instance.Config.ActiveInEntrance)
             {
                 foreach (var controller in flickerControllerInstances)
                 {
