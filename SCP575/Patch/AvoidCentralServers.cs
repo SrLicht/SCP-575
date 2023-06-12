@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
 using NorthwoodLib.Pools;
+using SCP575.Resources;
 
 namespace SCP575.Patch
 {
@@ -22,12 +23,12 @@ namespace SCP575.Patch
 
             newInstructions.InsertRange(0, new List<CodeInstruction>()
             {
-                new(OpCodes.Ldsfld, AccessTools.Field(typeof(Scp575), nameof(Scp575.Dummies))),
+                new(OpCodes.Ldsfld, AccessTools.Field(typeof(Dummies), nameof(Dummies.AllDummies))),
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Ldfld,
                     AccessTools.Field(typeof(CharacterClassManager), nameof(CharacterClassManager._hub))),
                 new(OpCodes.Callvirt,
-                    AccessTools.Method(typeof(List<ReferenceHub>), nameof(List<ReferenceHub>.Contains))),
+                    AccessTools.Method(typeof(HashSet<ReferenceHub>), nameof(HashSet<ReferenceHub>.Contains))),
                 new(OpCodes.Brfalse_S, skip),
                 new(OpCodes.Ldc_I4_2),
                 new(OpCodes.Starg_S, 1),
