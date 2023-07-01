@@ -1,18 +1,34 @@
-using System;
 using Mirror;
+using System;
 
 namespace SCP575.Resources
 {
     public class FakeConnection : NetworkConnectionToClient
     {
-        public override void Send(ArraySegment<byte> segment, int channelId = 0)
+
+        public FakeConnection(int networkConnectionId) : base(networkConnectionId)
         {
         }
 
-        public override string address => "localhost";
-        
-        public FakeConnection(int networkConnectionId) : base(networkConnectionId, false, 0)
+        public override string address => "InYourBed";
+
+        public override void Send(ArraySegment<byte> segment, int channelId = 0)
         {
+            // Ignore
+        }
+
+        public override void Disconnect()
+        {
+            PluginAPI.Core.Log.Debug("Destroying Dummy", Scp575.Instance.Config.Debug);
+
+            try
+            {
+                Dummies.DestroyDummy(identity.gameObject.GetComponent<ReferenceHub>());
+            }
+            catch (Exception)
+            {
+                // Ignore
+            }
         }
     }
 }

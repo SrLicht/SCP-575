@@ -1,25 +1,33 @@
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using MapGeneration;
 using Mirror;
 using PluginAPI.Core;
-using PluginAPI.Helpers;
+using RemoteAdmin;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace SCP575.Resources
 {
     public static class Extensions
     {
+        private static List<RoomLightController> _roomLightsAffected = new();
         /// <summary>
         /// Checks for .ogg files in the sounds folder
         /// </summary>
         /// <returns></returns>
         public static bool AudioFileExist()
         {
-            var files = Directory.GetFiles(Scp575.Instance.AudioPath);
-            return files?.Length > 0 && files.FirstOrDefault(a => a.EndsWith(".ogg")) != null;
+            string pathToAudios = Scp575.Instance.Config.PathToAudios;
+
+            string[] files = Directory.GetFiles(pathToAudios);
+
+            return files?.Length > 0 && files.Any(a => a.EndsWith(".ogg"));
         }
+
+
 
         /// <summary>
         /// Checks if the player is in a room that is on the blacklist.
@@ -36,23 +44,11 @@ namespace SCP575.Resources
         /// Gets the audio files from the folder, if there is more than one it will take one at random.
         /// </summary>
         /// <returns></returns>
-        public static string GetAudioFilePath()
+        public static string GetRandomAudioFile()
         {
-            var files = Directory.GetFiles(Scp575.Instance.AudioPath);
-            var audios = files.Where(a => a.EndsWith(".ogg"));
+            var files = Directory.GetFiles(Scp575.Instance.Config.PathToAudios, "*.ogg");
 
-            return audios.Any() ? audios.ElementAtOrDefault(Random.Range(0, audios.Count())) : null;
-        }
-
-        /// <summary>
-        /// Create the Sound Directory if it does not exist
-        /// </summary>
-        public static void CreateDirectory()
-        {
-            if (!Directory.Exists(Scp575.Instance.AudioPath))
-            {
-                Directory.CreateDirectory(Scp575.Instance.AudioPath);
-            }
+            return files.Any() ? files.ElementAtOrDefault(UnityEngine.Random.Range(0, files.Count())) : null;
         }
 
         /// <summary>
@@ -60,51 +56,67 @@ namespace SCP575.Resources
         /// </summary>
         public static bool IsDummy(ReferenceHub hub)
         {
-            return Scp575.Dummies.Contains(hub);
+            return Dummies.AllDummies.Contains(hub);
         }
 
         /// <summary>
         /// Turns off the lights in the specified zone, for a period of time.
         /// </summary>
         /// <param name="duration">The duration in seconds of the blackout</param>
-        public static void FlickerLights(float duration, bool antiScp173 = false)
+        public static void StartBlackout(float duration, bool antiScp173 = false)
         {
-            var flickerControllerInstances = FlickerableLightController.Instances;
+            var roomLightControllers = RoomLightController.Instances;
+            _roomLightsAffected.Clear();
 
-            if (SCP575.Scp575.Instance.Config.ActiveInHeavy)
+            if (Scp575.Instance.Config.ActiveInHeavy)
             {
-                foreach (var controller in flickerControllerInstances)
+                foreach (var controller in roomLightControllers)
                 {
                     if (controller.Room.Zone != FacilityZone.HeavyContainment ||
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
+
                     controller.ServerFlickerLights(duration);
+                    _roomLightsAffected.Add(controller);
                 }
             }
 
-            if (SCP575.Scp575.Instance.Config.ActiveInLight)
+            if (Scp575.Instance.Config.ActiveInLight)
             {
                 if (!antiScp173)
                 {
-                    foreach (var controller in flickerControllerInstances)
+                    foreach (var controller in roomLightControllers)
                     {
                         if (controller.Room.Zone != FacilityZone.LightContainment ||
                             Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
                             Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
                         controller.ServerFlickerLights(duration);
+                        _roomLightsAffected.Add(controller);
                     }
                 }
             }
 
-            if (SCP575.Scp575.Instance.Config.ActiveInEntrance)
+            if (Scp575.Instance.Config.ActiveInEntrance)
             {
-                foreach (var controller in flickerControllerInstances)
+                foreach (var controller in roomLightControllers)
                 {
                     if (controller.Room.Zone != FacilityZone.Entrance ||
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
                     controller.ServerFlickerLights(duration);
+                    _roomLightsAffected.Add(controller);
                 }
+            }
+        }
+
+        /// <summary>
+        /// End current blackout.
+        /// </summary>
+        public static void EndBlackout()
+        {
+            foreach(var roomLight in _roomLightsAffected)
+            {
+                roomLight.ServerFlickerLights(0);
             }
         }
 
@@ -115,7 +127,7 @@ namespace SCP575.Resources
         /// <returns></returns>
         public static bool IsRoomIlluminated(RoomIdentifier roomId)
         {
-            var lightController = roomId.GetComponentInChildren<FlickerableLightController>();
+            var lightController = roomId.GetComponentInChildren<RoomLightController>();
 
             return lightController != null && lightController.NetworkLightsEnabled;
         }

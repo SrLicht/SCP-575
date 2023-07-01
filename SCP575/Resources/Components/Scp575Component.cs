@@ -1,20 +1,14 @@
-using System;
-using System.Collections.Generic;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Flashlight;
-using InventorySystem.Items.Usables;
 using MapGeneration;
 using MEC;
-using Mirror;
 using PlayerRoles;
 using PlayerRoles.FirstPersonControl;
-using PlayerRoles.PlayableScps;
-using PlayerRoles.PlayableScps.Scp106;
 using PluginAPI.Core;
-using SCPSLAudioApi.AudioCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Object = UnityEngine.Object;
 
 namespace SCP575.Resources.Components
 {
@@ -71,7 +65,7 @@ namespace SCP575.Resources.Components
 
         private IEnumerator<float> Follow()
         {
-            for (;;)
+            for (; ; )
             {
                 yield return Timing.WaitForSeconds(0.1f);
 
@@ -103,6 +97,7 @@ namespace SCP575.Resources.Components
                 if (_firstSpawn)
                 {
                     // Wait for SCP-575 to spawn completely and be in the player's room.
+                    _victimFpc = (IFpcRole)Victim.ReferenceHub.roleManager.CurrentRole;
                     yield return Timing.WaitForSeconds(0.8f);
                     _firstSpawn = false;
                 }
@@ -111,13 +106,33 @@ namespace SCP575.Resources.Components
 
                 if (_fpcScp575 != null)
                 {
-                    if (distance >= Scp575.Instance.Config.Scp575.MaxDistance) Destroy();
+                    if (distance >= Scp575.Instance.Config.Scp575.MaxDistance)
+                        Destroy();
                     else if (distance >= Scp575.Instance.Config.Scp575.MediumDistance)
                     {
-                        var directionFast = Victim.Position - Position;
-                        directionFast = directionFast.normalized;
-                        var velocityFast = directionFast * Scp575.Instance.Config.Scp575.MovementSpeedFast;
-                        _fpcScp575.FpcModule.CharController.Move(velocityFast * Time.deltaTime);
+                        if (Scp575.Instance.Config.Scp575.ChangeMovementSpeedIfRun)
+                        {
+                            if(_victimFpc != null && _victimFpc.FpcModule.CurrentMovementState == PlayerMovementState.Sprinting)
+                            {
+                                var directionRunning = Victim.Position - Position;
+                                directionRunning = directionRunning.normalized;
+                                var velocityRunning = directionRunning * Scp575.Instance.Config.Scp575.MovementSpeedRunning;
+                                _fpcScp575.FpcModule.CharController.Move(velocityRunning * Time.deltaTime);
+                                continue;
+                            }
+
+                            var directionFast = Victim.Position - Position;
+                            directionFast = directionFast.normalized;
+                            var velocityFast = directionFast * Scp575.Instance.Config.Scp575.MovementSpeedFast;
+                            _fpcScp575.FpcModule.CharController.Move(velocityFast * Time.deltaTime);
+                        }
+                        else
+                        {
+                            var directionFast = Victim.Position - Position;
+                            directionFast = directionFast.normalized;
+                            var velocityFast = directionFast * Scp575.Instance.Config.Scp575.MovementSpeedFast;
+                            _fpcScp575.FpcModule.CharController.Move(velocityFast * Time.deltaTime);
+                        }
                     }
                     else if (distance > Scp575.Instance.Config.Scp575.MinDistance)
                     {
@@ -150,7 +165,7 @@ namespace SCP575.Resources.Components
         /// <returns></returns>
         private IEnumerator<float> Checks()
         {
-            for (;;)
+            for (; ; )
             {
                 yield return Timing.WaitForSeconds(5.0f);
 
@@ -166,12 +181,17 @@ namespace SCP575.Resources.Components
         /// </summary>
         private void OnDestroy()
         {
-            var audioPlayer = Scp575AudioPlayer.Get(ReferenceHub);
-            audioPlayer.Stoptrack(true);
+            if (Scp575.Instance.Config.BlackOut.EndBlackoutWhenDisappearing)
+                Extensions.EndBlackout();
 
-            Timing.KillCoroutines(_checksCoroutine);
-            Scp575.Dummies.Remove(ReferenceHub);
-            NetworkServer.Destroy(ReferenceHub.gameObject);
+            var dummyPlayer = Dummies.DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == ReferenceHub);
+
+            dummyPlayer?.StopAudio();
+
+            Timing.CallDelayed(0.5f, () =>
+            {
+                Dummies.DestroyDummy(ReferenceHub);
+            });
         }
 
         /// <summary>
@@ -201,6 +221,8 @@ namespace SCP575.Resources.Components
         private bool _firstSpawn = false;
 
         private IFpcRole _fpcScp575;
+
+        private IFpcRole _victimFpc;
 
         private bool _delayChase = false;
 
