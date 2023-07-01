@@ -192,10 +192,11 @@ namespace SCP575.Resources
             }
         }
 
+
         /// <summary>
-		/// Gets or sets the dummy display name.
-		/// </summary>
-		public string DisplayNickname
+        /// Gets or sets the dummy display name.
+        /// </summary>
+        public string DisplayNickname
         {
             get => ReferenceHub.nicknameSync.DisplayName;
             set => ReferenceHub.nicknameSync.DisplayName = value;
