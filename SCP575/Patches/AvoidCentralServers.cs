@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Reflection.Emit;
 using HarmonyLib;
 using NorthwoodLib.Pools;
 using SCP575.Resources;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace SCP575.Patch
 {

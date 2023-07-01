@@ -1,11 +1,6 @@
 ﻿using HarmonyLib;
 using PlayerRoles.FirstPersonControl;
 using SCP575.Resources;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SCP575.Patch
 {

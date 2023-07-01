@@ -1,7 +1,7 @@
-using System.Collections.Generic;
-using System.ComponentModel;
 using MapGeneration;
 using PlayerRoles;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SCP575
 {
@@ -48,10 +48,10 @@ namespace SCP575
     {
         [Description("After this time, the constant blackouts will begin to be executed.")]
         public float InitialDelay { get; set; } = 300f;
-        
+
         [Description("If this value is true initial_delay will be ignored and a calculation will be made between initial_max_delay and initial_min_delay which will result in the delay")]
         public bool RandomInitialDelay { get; set; } = false;
-        
+
         [Description("The maximum time that the main delay can have")]
         public float InitialMaxDelay { get; set; } = 250f;
 
@@ -76,7 +76,7 @@ namespace SCP575
 
         [Description("I have no idea what it does")]
         public bool CassieIsHold { get; set; } = false;
-        
+
         [Description("Enable o disable bells in cassie announcement")]
         public bool CassieIsNoise { get; set; } = true;
 

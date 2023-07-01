@@ -1,17 +1,17 @@
 ﻿using InventorySystem.Items;
 using MapGeneration;
+using MEC;
 using Mirror;
-using PlayerRoles.FirstPersonControl;
 using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
 using PlayerStatsSystem;
+using PluginAPI.Core;
 using SCPSLAudioApi.AudioCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using VoiceChat;
-using PluginAPI.Core;
-using MEC;
 
 namespace SCP575.Resources
 {
@@ -125,7 +125,7 @@ namespace SCP575.Resources
                 AllDummies.Remove(hub.ReferenceHub);
                 NetworkServer.RemovePlayerForConnection(hub.ReferenceHub.connectionToClient, true);
             });
-            
+
         }
     }
 
@@ -157,7 +157,7 @@ namespace SCP575.Resources
         /// Get dummy id.
         /// </summary>
         public int Id => _id;
-        
+
         /// <summary>
         /// Gets dummy <see cref="UnityEngine.GameObject"/>
         /// </summary>

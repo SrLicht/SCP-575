@@ -5,10 +5,7 @@ using MEC;
 using PluginAPI.Core;
 using SCP575.Resources;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SCP575.Command
@@ -22,11 +19,11 @@ namespace SCP575.Command
 
         public string Description => "This command allows you to spawn instances of SCP-575.";
 
-        public string[] Usage { get; } = {"Player ID", "Duration"};
+        public string[] Usage { get; } = { "Player ID", "Duration" };
 
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            if(sender != null)
+            if (sender != null)
             {
                 if (!Round.IsRoundStarted)
                 {
@@ -34,27 +31,27 @@ namespace SCP575.Command
                     return false;
                 }
                 // Display help response.
-                if(arguments.Count < 1 || arguments.IsEmpty() || arguments.Count > 2)
+                if (arguments.Count < 1 || arguments.IsEmpty() || arguments.Count > 2)
                 {
                     var text = string.Format(Scp575.Instance.Config.CommandResponses.HelpResponse, this.DisplayCommandUsage());
                     response = text;
                     return false;
                 }
 
-                if(!int.TryParse(arguments.At(0), out int playerId))
+                if (!int.TryParse(arguments.At(0), out int playerId))
                 {
                     response = string.Format(Scp575.Instance.Config.CommandResponses.InvalidPlayerId, arguments.At(0));
                     return false;
                 }
 
                 var victim = Player.Get(playerId);
-                if(victim is null)
+                if (victim is null)
                 {
                     response = Scp575.Instance.Config.CommandResponses.PlayerNotFound;
                     return false;
                 }
 
-                if(!int.TryParse(arguments.At(1), out var duration))
+                if (!int.TryParse(arguments.At(1), out var duration))
                 {
                     response = string.Format(Scp575.Instance.Config.CommandResponses.InvalidDuration, arguments.At(1));
                     return false;

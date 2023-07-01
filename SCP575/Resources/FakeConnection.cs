@@ -1,7 +1,5 @@
-using System;
-using GameCore;
 using Mirror;
-using PluginAPI.Core;
+using System;
 
 namespace SCP575.Resources
 {

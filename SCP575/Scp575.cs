@@ -1,21 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using HarmonyLib;
 using Interactables.Interobjects.DoorUtils;
 using MapGeneration;
 using MEC;
-using Mirror;
 using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
 using PluginAPI.Core;
 using PluginAPI.Core.Attributes;
 using PluginAPI.Enums;
 using PluginAPI.Helpers;
 using Respawning;
 using SCP575.Resources;
-using SCPSLAudioApi.AudioCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using VoiceChat;
 using Extensions = SCP575.Resources.Extensions;
@@ -142,10 +139,10 @@ namespace SCP575
                 var blackoutDuration =
                     (float)_rng.NextDouble() * (Config.BlackOut.MaxDuration - Config.BlackOut.MinDuration) +
                     Config.BlackOut.MinDuration;
-                
+
                 // Send Cassie's message to everyone
                 RespawnEffectsController.PlayCassieAnnouncement(Config.BlackOut.CassieMessage, Config.BlackOut.CassieIsHold, Config.BlackOut.CassieIsNoise);
-                
+
                 // Wait for Cassie to finish speaking
                 yield return Timing.WaitForSeconds(Config.BlackOut.DelayAfterCassie);
 
@@ -253,7 +250,7 @@ namespace SCP575
                 if (!Config.Scp575.PlaySounds) return;
                 if (!Extensions.AudioFileExist()) Log.Error($"There is no .ogg file in the folder {AudioPath}");
                 var audioFile = Extensions.GetAudioFilePath();
-                scp575.PlayAudio(audioFile,channel: VoiceChatChannel.RoundSummary, volume: Config.Scp575.SoundVolume);
+                scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Config.Scp575.SoundVolume);
                 scp575.AudioPlayerBase.LogDebug = Config.AudioDebug;
                 Log.Debug($"Playing sound {audioFile}", Config.Debug);
             }
@@ -279,7 +276,7 @@ namespace SCP575
                     foreach (var player in playerList)
                     {
                         if (player?.Room is null) continue;
-                        
+
                         if (player.IsAlive && !player.IsSCP && !player.IsTutorial &&
                             player.Zone == FacilityZone.LightContainment
                             && !player.IsInInvalidRoom())
@@ -295,7 +292,7 @@ namespace SCP575
                     foreach (var player in playerList)
                     {
                         if (player?.Room is null) continue;
-                        
+
                         if (player.IsAlive && !player.IsSCP && !player.IsTutorial &&
                             player.Zone == FacilityZone.HeavyContainment
                             && !player.IsInInvalidRoom())
@@ -313,7 +310,7 @@ namespace SCP575
                     foreach (var player in playerList)
                     {
                         if (player?.Room is null) continue;
-                        
+
                         if (player.IsAlive && !player.IsSCP && !player.IsTutorial && player.Zone == FacilityZone.Entrance
                             && !player.IsInInvalidRoom())
                         {

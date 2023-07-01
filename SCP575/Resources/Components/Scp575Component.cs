@@ -1,21 +1,14 @@
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Flashlight;
+using MapGeneration;
+using MEC;
+using PlayerRoles;
+using PlayerRoles.FirstPersonControl;
+using PluginAPI.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using InventorySystem.Items.Firearms;
-using InventorySystem.Items.Flashlight;
-using InventorySystem.Items.Usables;
-using MapGeneration;
-using MEC;
-using Mirror;
-using PlayerRoles;
-using PlayerRoles.FirstPersonControl;
-using PlayerRoles.PlayableScps;
-using PlayerRoles.PlayableScps.Scp106;
-using PluginAPI.Core;
-using SCPSLAudioApi.AudioCore;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Object = UnityEngine.Object;
 
 namespace SCP575.Resources.Components
 {
@@ -72,7 +65,7 @@ namespace SCP575.Resources.Components
 
         private IEnumerator<float> Follow()
         {
-            for (;;)
+            for (; ; )
             {
                 yield return Timing.WaitForSeconds(0.1f);
 
@@ -151,7 +144,7 @@ namespace SCP575.Resources.Components
         /// <returns></returns>
         private IEnumerator<float> Checks()
         {
-            for (;;)
+            for (; ; )
             {
                 yield return Timing.WaitForSeconds(5.0f);
 
@@ -170,7 +163,7 @@ namespace SCP575.Resources.Components
             var dummyPlayer = Dummies.DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == ReferenceHub);
 
             dummyPlayer?.StopAudio();
-            
+
             Timing.CallDelayed(0.5f, () =>
             {
                 Dummies.DestroyDummy(ReferenceHub);
