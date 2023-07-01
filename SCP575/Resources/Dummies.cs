@@ -86,6 +86,7 @@ namespace SCP575.Resources
                 {
                     var dummy = DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == hub);
                     dummy.StopAudio();
+                    DummiesPlayers.Remove(dummy);
 
                     Timing.CallDelayed(0.2f, () =>
                     {
@@ -104,6 +105,7 @@ namespace SCP575.Resources
                 throw new ArgumentOutOfRangeException("hub", "Dummy player is not on the Dummies list");
             var dummy = DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == hub);
             dummy.StopAudio();
+            DummiesPlayers.Remove(dummy);
 
             Timing.CallDelayed(0.2f, () =>
             {
