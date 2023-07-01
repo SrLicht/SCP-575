@@ -136,15 +136,15 @@ namespace SCP575.Resources
         }
 
         /// <summary>
-		/// Get dummy current room.
-		/// </summary>
-		public RoomIdentifier Room => RoomIdUtils.RoomAtPosition(GameObject.transform.position);
+        /// Get dummy current room.
+        /// </summary>
+        public RoomIdentifier Room => RoomIdUtils.RoomAtPosition(GameObject.transform.position);
 
 
         /// <summary>
-		/// Get player current zone.
-		/// </summary>
-		public FacilityZone Zone => Room?.Zone ?? FacilityZone.None;
+        /// Get player current zone.
+        /// </summary>
+        public FacilityZone Zone => Room?.Zone ?? FacilityZone.None;
 
 
         /// <summary>
@@ -173,9 +173,9 @@ namespace SCP575.Resources
         public Team Team => Role.GetTeam();
 
         /// <summary>
-		/// Gets or sets the dummy position.
-		/// </summary>
-		public Vector3 Position
+        /// Gets or sets the dummy position.
+        /// </summary>
+        public Vector3 Position
         {
             get => GameObject.transform.position;
             set => ReferenceHub.TryOverridePosition(value, Vector3.zero);
@@ -236,4 +236,5 @@ namespace SCP575.Resources
             AudioPlayerBase.Play(0);
         }
     }
+
 }
