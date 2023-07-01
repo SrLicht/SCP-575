@@ -220,6 +220,7 @@ namespace SCP575.Resources
             if (player != null)
                 AudioPlayerBase.BroadcastTo.Add(player.PlayerId);
 
+            AudioPlayerBase.Loop = Scp575.Instance.Config.Scp575.AudioIsLooped;
             AudioPlayerBase.Enqueue(filepath, 0);
             AudioPlayerBase.Play(0);
         }

@@ -46,14 +46,18 @@ namespace SCP575
         /// </summary>
         private const string Version = "1.1.0";
 
+        [PluginPriority(LoadPriority.High)]
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
         private void OnLoadPlugin()
         {
             try
             {
                 Instance = this;
+                Log.Warning("Since the release of &213.1&r it is necessary to update &1SCPSLAudioApi&r to version &10.0.5&r if you have already done it ignore this warning.");
+                SCPSLAudioApi.Startup.SetupDependencies();
                 if (!Config.IsEnabled) return;
-                Extensions.CreateDirectory();
+                var configPath = Path.Combine(Paths.LocalPlugins.Plugins, "SCP-575");
+                Directory.CreateDirectory(Path.Combine(configPath, "Audios"));
                 PluginAPI.Events.EventManager.RegisterEvents(this);
             }
             catch (Exception e)
@@ -63,7 +67,7 @@ namespace SCP575
 
             try
             {
-                _harmonyInstance = new Harmony($"SrLicht.{DateTime.UtcNow.Ticks}");
+                _harmonyInstance = new Harmony($"SrLicht.575.{DateTime.UtcNow.Ticks}");
                 _harmonyInstance.PatchAll();
             }
             catch (Exception e)
@@ -248,10 +252,14 @@ namespace SCP575
                 comp.Destroy(duration);
 
                 if (!Config.Scp575.PlaySounds) return;
-                if (!Extensions.AudioFileExist()) Log.Error($"There is no .ogg file in the folder {AudioPath}");
-                var audioFile = Extensions.GetAudioFilePath();
+                if (!Extensions.AudioFileExist())
+                    Log.Error($"There is no .ogg file in the folder {AudioPath}");
+
+                if(Config.AudioDebug)
+                    scp575.AudioPlayerBase.LogDebug = Config.AudioDebug;
+
+                var audioFile = Extensions.GetRandomAudioFile();
                 scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Config.Scp575.SoundVolume);
-                scp575.AudioPlayerBase.LogDebug = Config.AudioDebug;
                 Log.Debug($"Playing sound {audioFile}", Config.Debug);
             }
             catch (Exception e)

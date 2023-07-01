@@ -97,6 +97,7 @@ namespace SCP575.Resources.Components
                 if (_firstSpawn)
                 {
                     // Wait for SCP-575 to spawn completely and be in the player's room.
+                    _victimFpc = (IFpcRole)Victim.ReferenceHub.roleManager.CurrentRole;
                     yield return Timing.WaitForSeconds(0.8f);
                     _firstSpawn = false;
                 }
@@ -105,13 +106,33 @@ namespace SCP575.Resources.Components
 
                 if (_fpcScp575 != null)
                 {
-                    if (distance >= Scp575.Instance.Config.Scp575.MaxDistance) Destroy();
+                    if (distance >= Scp575.Instance.Config.Scp575.MaxDistance)
+                        Destroy();
                     else if (distance >= Scp575.Instance.Config.Scp575.MediumDistance)
                     {
-                        var directionFast = Victim.Position - Position;
-                        directionFast = directionFast.normalized;
-                        var velocityFast = directionFast * Scp575.Instance.Config.Scp575.MovementSpeedFast;
-                        _fpcScp575.FpcModule.CharController.Move(velocityFast * Time.deltaTime);
+                        if (Scp575.Instance.Config.Scp575.ChangeMovementSpeedIfRun)
+                        {
+                            if(_victimFpc != null && _victimFpc.FpcModule.CurrentMovementState == PlayerMovementState.Sprinting)
+                            {
+                                var directionRunning = Victim.Position - Position;
+                                directionRunning = directionRunning.normalized;
+                                var velocityRunning = directionRunning * Scp575.Instance.Config.Scp575.MovementSpeedRunning;
+                                _fpcScp575.FpcModule.CharController.Move(velocityRunning * Time.deltaTime);
+                                continue;
+                            }
+
+                            var directionFast = Victim.Position - Position;
+                            directionFast = directionFast.normalized;
+                            var velocityFast = directionFast * Scp575.Instance.Config.Scp575.MovementSpeedFast;
+                            _fpcScp575.FpcModule.CharController.Move(velocityFast * Time.deltaTime);
+                        }
+                        else
+                        {
+                            var directionFast = Victim.Position - Position;
+                            directionFast = directionFast.normalized;
+                            var velocityFast = directionFast * Scp575.Instance.Config.Scp575.MovementSpeedFast;
+                            _fpcScp575.FpcModule.CharController.Move(velocityFast * Time.deltaTime);
+                        }
                     }
                     else if (distance > Scp575.Instance.Config.Scp575.MinDistance)
                     {
@@ -197,6 +218,8 @@ namespace SCP575.Resources.Components
         private bool _firstSpawn = false;
 
         private IFpcRole _fpcScp575;
+
+        private IFpcRole _victimFpc;
 
         private bool _delayChase = false;
 

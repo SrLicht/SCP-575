@@ -8,6 +8,13 @@ namespace SCP575.Patch
     public class UpdateFloating
     {
         public static bool Prefix(FpcMotor __instance)
-            => !Extensions.IsDummy(__instance.Hub);
+        {
+            if (Scp575.Instance.Config.Scp575.WeirdMovement && Extensions.IsDummy(__instance.Hub))
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -118,6 +118,7 @@ namespace SCP575.Resources
         {
             if (!AllDummies.Contains(hub.ReferenceHub))
                 throw new ArgumentOutOfRangeException("hub", "Dummy player is not on the Dummies list");
+
             hub.StopAudio();
 
             Timing.CallDelayed(0.2f, () =>

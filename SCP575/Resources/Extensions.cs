@@ -1,6 +1,7 @@
 using MapGeneration;
 using Mirror;
 using PluginAPI.Core;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,9 +17,14 @@ namespace SCP575.Resources
         /// <returns></returns>
         public static bool AudioFileExist()
         {
-            var files = Directory.GetFiles(Scp575.Instance.AudioPath);
-            return files?.Length > 0 && files.FirstOrDefault(a => a.EndsWith(".ogg")) != null;
+            string pathToAudios = Scp575.Instance.Config.PathToAudios;
+
+            string[] files = Directory.GetFiles(pathToAudios);
+
+            return files?.Length > 0 && files.Any(a => a.EndsWith(".ogg"));
         }
+
+
 
         /// <summary>
         /// Checks if the player is in a room that is on the blacklist.
@@ -35,23 +41,11 @@ namespace SCP575.Resources
         /// Gets the audio files from the folder, if there is more than one it will take one at random.
         /// </summary>
         /// <returns></returns>
-        public static string GetAudioFilePath()
+        public static string GetRandomAudioFile()
         {
-            var files = Directory.GetFiles(Scp575.Instance.AudioPath);
-            var audios = files.Where(a => a.EndsWith(".ogg"));
+            var files = Directory.GetFiles(Scp575.Instance.Config.PathToAudios, "*.ogg");
 
-            return audios.Any() ? audios.ElementAtOrDefault(Random.Range(0, audios.Count())) : null;
-        }
-
-        /// <summary>
-        /// Create the Sound Directory if it does not exist
-        /// </summary>
-        public static void CreateDirectory()
-        {
-            if (!Directory.Exists(Scp575.Instance.AudioPath))
-            {
-                Directory.CreateDirectory(Scp575.Instance.AudioPath);
-            }
+            return files.Any() ? files.ElementAtOrDefault(UnityEngine.Random.Range(0, files.Count())) : null;
         }
 
         /// <summary>
@@ -68,11 +62,11 @@ namespace SCP575.Resources
         /// <param name="duration">The duration in seconds of the blackout</param>
         public static void FlickerLights(float duration, bool antiScp173 = false)
         {
-            var flickerControllerInstances = FlickerableLightController.Instances;
+            var roomLightControllers = RoomLightController.Instances;
 
             if (Scp575.Instance.Config.ActiveInHeavy)
             {
-                foreach (var controller in flickerControllerInstances)
+                foreach (var controller in roomLightControllers)
                 {
                     if (controller.Room.Zone != FacilityZone.HeavyContainment ||
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
@@ -85,7 +79,7 @@ namespace SCP575.Resources
             {
                 if (!antiScp173)
                 {
-                    foreach (var controller in flickerControllerInstances)
+                    foreach (var controller in roomLightControllers)
                     {
                         if (controller.Room.Zone != FacilityZone.LightContainment ||
                             Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
@@ -97,7 +91,7 @@ namespace SCP575.Resources
 
             if (Scp575.Instance.Config.ActiveInEntrance)
             {
-                foreach (var controller in flickerControllerInstances)
+                foreach (var controller in roomLightControllers)
                 {
                     if (controller.Room.Zone != FacilityZone.Entrance ||
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
@@ -114,7 +108,7 @@ namespace SCP575.Resources
         /// <returns></returns>
         public static bool IsRoomIlluminated(RoomIdentifier roomId)
         {
-            var lightController = roomId.GetComponentInChildren<FlickerableLightController>();
+            var lightController = roomId.GetComponentInChildren<RoomLightController>();
 
             return lightController != null && lightController.NetworkLightsEnabled;
         }

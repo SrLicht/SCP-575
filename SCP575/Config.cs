@@ -2,6 +2,8 @@ using MapGeneration;
 using PlayerRoles;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using YamlDotNet.Serialization;
 
 namespace SCP575
 {
@@ -12,6 +14,9 @@ namespace SCP575
 
         [Description("Enable the Logs.Debug of light points and other logs.")]
         public bool Debug { get; set; } = false;
+
+        [Description("Path to the folder where the audios are located")]
+        public string PathToAudios { get; set; } = Path.Combine(ConfigPath, "Audios");
 
         [Description("Enable the Logs.Debug of SCPSLAudioApi, warning can be very spammy.")]
         public bool AudioDebug { get; set; } = false;
@@ -42,6 +47,9 @@ namespace SCP575
 
         [Description("Here you can translate the responses given by the command when executed, unfortunately due to NWAPI limitations I cannot give a configuration to change the command description.")]
         public ResponseCommandConfig CommandResponses { get; set; } = new ResponseCommandConfig();
+
+        [YamlIgnore]
+        private static string ConfigPath => Path.Combine(PluginAPI.Helpers.Paths.LocalPlugins.Plugins, "SCP-575");
     }
 
     public class BlackoutConfig
@@ -102,6 +110,9 @@ namespace SCP575
 
     public class Scp575Config
     {
+        [Description("Enabling this will activate the patch that prevents the server from making the SCP-575 not float, causing a rather strange movement.  I thought it was fun to leave it as an option")]
+        public bool WeirdMovement { get; set; } = false;
+
         [Description("The name the dummy will have")]
         public string Nickname { get; set; } = "SCP-575-B";
 
@@ -124,6 +135,9 @@ namespace SCP575
             "Should SCP-575 play the sounds files found in its folder? | The sound file must be .ogg need to be mono channel and have a frequency of 48000 Hz")]
         public bool PlaySounds { get; set; } = false;
 
+        [Description("The audio track replayed by the SCP-575 will loop until it is destroyed.")]
+        public bool AudioIsLooped { get; set; } = false;
+
         [Description("The volume of the sound to be reproduced by the SCP-575, high values violate the VSR.")]
         public float SoundVolume { get; set; } = 85f;
 
@@ -138,8 +152,7 @@ namespace SCP575
             "The maximum distance that SCP-575 can be from its victim, remember that it must be greater than 16")]
         public float MaxDistance { get; set; } = 28f;
 
-        [Description(
-            "If the distance is equal to or greater than this value, the speed that is movement_speed_fast will be applied to the SCP-575.")]
+        [Description("If the distance is equal to or greater than this value, the speed that is movement_speed_fast will be applied to the SCP-575.")]
         public float MediumDistance { get; set; } = 16f;
 
         [Description(
@@ -157,6 +170,12 @@ namespace SCP575
         [Description(
             "If the distance between SCP-575 and its victim is equal to or greater than 5, it will have this movement speed")]
         public float MovementSpeed { get; set; } = 22;
+
+        [Description("Enabling this setting if the victim is running and is in the MediumDistance range the 575 will move faster.")]
+        public bool ChangeMovementSpeedIfRun { get; set; } = false;
+
+        [Description("At what speed will the SCP-575 move if the target is running if ChangeMovementSpeedIfRun is false this will not be used.")]
+        public float MovementSpeedRunning { get; set; } = 25;
 
         [Description(
             "This is complicated to explain, so I'll just tell you what I do in the code. If a player has a flashlight on and points it at SCP-575 I fire a ray of light that if it touches SCP-575 adds a point of light, when it reaches a certain point of light SCP-575 disappears. The coroutine that checks these points is executed every 0.1s.")]
@@ -176,8 +195,9 @@ namespace SCP575
 
         public string InvalidDuration { get; set; } = "{0} is not an valid duration";
 
-        public string Spawning { get; set; } = "Spawning a SCP-575 to hunt {0}";
+        public string Spawning { get; set; } = "Spawning a SCP-575 to hunt {0} for {1} seconds";
 
+        [YamlMember(ScalarStyle = YamlDotNet.Core.ScalarStyle.DoubleQuoted)]
         public string HelpResponse { get; set; } = "Correct use of the command {0}\nPlayer ID | It is a numerical ID that changes with each new round and each time someone connects to the server again.\nDuration | The time (in seconds) that the SCP-575 will hunt someone";
     }
 }

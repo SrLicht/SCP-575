@@ -7,6 +7,7 @@ using SCP575.Resources;
 using System;
 using System.Linq;
 using UnityEngine;
+using VoiceChat;
 
 namespace SCP575.Command
 {
@@ -59,7 +60,7 @@ namespace SCP575.Command
 
                 SpawnScp575(victim, duration);
 
-                response = string.Format(Scp575.Instance.Config.CommandResponses.Spawning, victim.Nickname);
+                response = string.Format(Scp575.Instance.Config.CommandResponses.Spawning, victim.Nickname, duration);
                 return true;
             }
             else
@@ -111,10 +112,19 @@ namespace SCP575.Command
 
             if (!Scp575.Instance.Config.Scp575.PlaySounds) return;
 
-            if (!Extensions.AudioFileExist()) Log.Error($"There is no .ogg file in the folder {Scp575.Instance.AudioPath}");
-            var audioFile = Extensions.GetAudioFilePath();
-            scp575.PlayAudio(audioFile, player: victim, volume: Scp575.Instance.Config.Scp575.SoundVolume);
+            if (!Extensions.AudioFileExist())
+                Log.Error($"There is no .ogg file in the folder {Scp575.Instance.Config.PathToAudios}");
             scp575.AudioPlayerBase.LogDebug = Scp575.Instance.Config.AudioDebug;
+
+            var audioFile = Extensions.GetRandomAudioFile();
+
+            if (string.IsNullOrEmpty(audioFile))
+            {
+                Log.Error("AudioFile is null audio file no longer exists in the folder or something is broken");
+                return;
+            }
+
+            scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Scp575.Instance.Config.Scp575.SoundVolume);
             Log.Debug($"Playing sound {audioFile}", Scp575.Instance.Config.Debug);
         }
     }
