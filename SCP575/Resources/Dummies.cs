@@ -192,7 +192,6 @@ namespace SCP575.Resources
             }
         }
 
-
         /// <summary>
         /// Gets or sets the dummy display name.
         /// </summary>
@@ -202,38 +201,43 @@ namespace SCP575.Resources
             set => ReferenceHub.nicknameSync.DisplayName = value;
         }
 
+
         /// <summary>
-		/// Gets or sets the dummy current role.
-		/// </summary>
-		public RoleTypeId Role
+        /// Gets or sets the dummy current role.
+        /// </summary>
+        public RoleTypeId Role
         {
             get => ReferenceHub.GetRoleId();
             set => ReferenceHub.roleManager.ServerSetRole(value, RoleChangeReason.RemoteAdmin);
         }
 
-        /// <summary>
-		/// Gets dummy <see cref="PlayerRoleBase"/>.
-		/// </summary>
-		public PlayerRoleBase RoleBase => ReferenceHub.roleManager.CurrentRole;
 
         /// <summary>
-		/// Gets or sets the dummy current health;
-		/// </summary>
-		public float Health
+        /// Gets dummy <see cref="PlayerRoleBase"/>.
+        /// </summary>
+        public PlayerRoleBase RoleBase => ReferenceHub.roleManager.CurrentRole;
+
+
+        /// <summary>
+        /// Gets or sets the dummy current health;
+        /// </summary>
+        public float Health
         {
             get => ((HealthStat)ReferenceHub.playerStats.StatModules[0]).CurValue;
             set => ((HealthStat)ReferenceHub.playerStats.StatModules[0]).CurValue = value;
         }
 
-        /// <summary>
-		/// Gets the dummy current maximum health;
-		/// </summary>
-		public float MaxHealth => ((HealthStat)ReferenceHub.playerStats.StatModules[0]).MaxValue;
 
         /// <summary>
-		/// Gets or sets the item in the dummy hand, returns the default value if empty.
-		/// </summary>
-		public ItemBase CurrentItem
+        /// Gets the dummy current maximum health;
+        /// </summary>
+        public float MaxHealth => ((HealthStat)ReferenceHub.playerStats.StatModules[0]).MaxValue;
+
+
+        /// <summary>
+        /// Gets or sets the item in the dummy hand, returns the default value if empty.
+        /// </summary>
+        public ItemBase CurrentItem
         {
             get => ReferenceHub.inventory.CurInstance;
             set
@@ -256,28 +260,31 @@ namespace SCP575.Resources
 		/// </summary>
 		public FacilityZone Zone => Room?.Zone ?? FacilityZone.None;
 
+
         /// <summary>
-		/// Gets whether or not the player has god mode.
-		/// </summary>
-		public bool IsGodModeEnabled
+        /// Gets whether or not the player has god mode.
+        /// </summary>
+        public bool IsGodModeEnabled
         {
             get => ReferenceHub.characterClassManager.GodMode;
             set => ReferenceHub.characterClassManager.GodMode = value;
         }
 
+
         /// <summary>
-		/// Gets whether or not the dummy has noclip.
-		/// </summary>
-		public bool IsNoclipEnabled
+        /// Gets whether or not the dummy has noclip.
+        /// </summary>
+        public bool IsNoclipEnabled
         {
             get => ReferenceHub.playerStats.GetModule<AdminFlagsStat>().HasFlag(AdminFlags.Noclip);
             set => ReferenceHub.playerStats.GetModule<AdminFlagsStat>().SetFlag(AdminFlags.Noclip, value);
         }
 
+
         /// <summary>
-		/// Get dummy team.
-		/// </summary>
-		public Team Team => Role.GetTeam();
+        /// Get dummy team.
+        /// </summary>
+        public Team Team => Role.GetTeam();
 
         /// <summary>
 		/// Gets or sets the dummy position.
@@ -288,14 +295,16 @@ namespace SCP575.Resources
             set => ReferenceHub.TryOverridePosition(value, Vector3.zero);
         }
 
+
         /// <summary>
-		/// Gets or sets dummy rotation.
-		/// </summary>
-		public Vector3 Rotation
+        /// Gets or sets dummy rotation.
+        /// </summary>
+        public Vector3 Rotation
         {
             get => GameObject.transform.eulerAngles;
             set => ReferenceHub.TryOverridePosition(Position, value);
         }
+
 
         /// <summary>
         /// Gets or sets dummy remaining stamina (min = 0, max = 1).
@@ -306,16 +315,29 @@ namespace SCP575.Resources
             set => ReferenceHub.playerStats.StatModules[2].CurValue = value;
         }
 
+        /// <summary>
+        /// Stop playing any audio.
+        /// </summary>
         public void StopAudio()
         {
             AudioPlayerBase.Stoptrack(true);
         }
 
+        /// <summary>
+        /// Add an audio to the audio queue
+        /// </summary>
         public void QueueAudio(string filepath)
         {
             AudioPlayerBase.Enqueue(filepath, -1);
         }
 
+        /// <summary>
+        /// Play an audio through the dummy using voice chat
+        /// </summary>
+        /// <param name="filepath">Audio to be played</param>
+        /// <param name="channel">On which channel the dummy will speak</param>
+        /// <param name="volume">The volume of the audio to be played by the dummy.</param>
+        /// <param name="player">If this is not null, only this player will be able to hear the audio played.</param>
         public void PlayAudio(string filepath, VoiceChatChannel channel = VoiceChatChannel.Proximity, float volume = 85, Player player = null)
         {
             StopAudio(); // just in case
