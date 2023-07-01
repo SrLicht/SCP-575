@@ -33,7 +33,6 @@ namespace SCP575.Resources
         /// </summary>
         public ReferenceHub ReferenceHub => _hub;
 
-
         /// <summary>
         /// Gets <see cref="SCPSLAudioApi.AudioCore.AudioPlayerBase"/> of the dummy.
         /// </summary>
@@ -87,7 +86,6 @@ namespace SCP575.Resources
             set => ReferenceHub.nicknameSync.DisplayName = value;
         }
 
-
         /// <summary>
         /// Gets or sets the dummy current role.
         /// </summary>
@@ -97,12 +95,10 @@ namespace SCP575.Resources
             set => ReferenceHub.roleManager.ServerSetRole(value, RoleChangeReason.RemoteAdmin);
         }
 
-
         /// <summary>
         /// Gets dummy <see cref="PlayerRoleBase"/>.
         /// </summary>
         public PlayerRoleBase RoleBase => ReferenceHub.roleManager.CurrentRole;
-
 
         /// <summary>
         /// Gets or sets the dummy current health;
@@ -113,12 +109,10 @@ namespace SCP575.Resources
             set => ((HealthStat)ReferenceHub.playerStats.StatModules[0]).CurValue = value;
         }
 
-
         /// <summary>
         /// Gets the dummy current maximum health;
         /// </summary>
         public float MaxHealth => ((HealthStat)ReferenceHub.playerStats.StatModules[0]).MaxValue;
-
 
         /// <summary>
         /// Gets or sets the item in the dummy hand, returns the default value if empty.
@@ -140,12 +134,10 @@ namespace SCP575.Resources
         /// </summary>
         public RoomIdentifier Room => RoomIdUtils.RoomAtPosition(GameObject.transform.position);
 
-
         /// <summary>
         /// Get player current zone.
         /// </summary>
         public FacilityZone Zone => Room?.Zone ?? FacilityZone.None;
-
 
         /// <summary>
         /// Gets whether or not the player has god mode.
@@ -156,7 +148,6 @@ namespace SCP575.Resources
             set => ReferenceHub.characterClassManager.GodMode = value;
         }
 
-
         /// <summary>
         /// Gets whether or not the dummy has noclip.
         /// </summary>
@@ -165,7 +156,6 @@ namespace SCP575.Resources
             get => ReferenceHub.playerStats.GetModule<AdminFlagsStat>().HasFlag(AdminFlags.Noclip);
             set => ReferenceHub.playerStats.GetModule<AdminFlagsStat>().SetFlag(AdminFlags.Noclip, value);
         }
-
 
         /// <summary>
         /// Get dummy team.
@@ -181,7 +171,6 @@ namespace SCP575.Resources
             set => ReferenceHub.TryOverridePosition(value, Vector3.zero);
         }
 
-
         /// <summary>
         /// Gets or sets dummy rotation.
         /// </summary>
@@ -190,7 +179,6 @@ namespace SCP575.Resources
             get => GameObject.transform.eulerAngles;
             set => ReferenceHub.TryOverridePosition(Position, value);
         }
-
 
         /// <summary>
         /// Gets or sets dummy remaining stamina (min = 0, max = 1).
