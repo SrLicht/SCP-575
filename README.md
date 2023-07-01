@@ -14,8 +14,9 @@ This plugin only works for [NWAPI](https://github.com/northwood-studios/NwPlugin
 
 This plugin uses as dependency [SCPSLAudioApi](https://github.com/CedModV2/SCPSLAudioApi)
 
-# SCPSLAudioApi dependency problem
+# Dependency problem with SCPSLAudioApi
 Because of how NWAPI loads the plugin dependencies if more than one plugin installed uses SCPSLAudioApi it will give error and will not start the server, to solve this you will have to put ``NVorbis.dll`` in the dependencies folder.
+
 **NVorbis.dll is included in a separate .zip file in the latest versions.**
 
 # Sounds
