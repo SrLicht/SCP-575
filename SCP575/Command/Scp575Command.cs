@@ -113,15 +113,11 @@ namespace SCP575.Command
             comp.Destroy(duration);
 
             if (!Scp575.Instance.Config.Scp575.PlaySounds) return;
+
             if (!Extensions.AudioFileExist()) Log.Error($"There is no .ogg file in the folder {Scp575.Instance.AudioPath}");
-            var audioPlayer = DummyAudioPlayer.Get(scp575.ReferenceHub);
             var audioFile = Extensions.GetAudioFilePath();
-            audioPlayer.Enqueue(audioFile, -1);
-            audioPlayer.LogDebug = Scp575.Instance.Config.AudioDebug;
-            //This will cause only the victim to be able to hear the music.
-            audioPlayer.BroadcastTo.Add(victim.PlayerId);
-            audioPlayer.Volume = Scp575.Instance.Config.Scp575.SoundVolume;
-            audioPlayer.Play(0);
+            scp575.PlayAudio(audioFile, player: victim, volume: Scp575.Instance.Config.Scp575.SoundVolume);
+            scp575.AudioPlayerBase.LogDebug = Scp575.Instance.Config.AudioDebug;
             Log.Debug($"Playing sound {audioFile}", Scp575.Instance.Config.Debug);
         }
     }

@@ -8,16 +8,17 @@ using SCPSLAudioApi.AudioCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using VoiceChat;
+using PluginAPI.Core;
+using MEC;
 
 namespace SCP575.Resources
 {
     public class Dummies
     {
         public static HashSet<ReferenceHub> AllDummies = new();
+        public static HashSet<DummyPlayer> DummiesPlayers = new();
 
         public static DummyPlayer CreateDummy()
         {
@@ -51,15 +52,15 @@ namespace SCP575.Resources
             var newPlayer =
                     UnityEngine.Object.Instantiate(NetworkManager.singleton.playerPrefab);
             int id = AllDummies.Count;
-            var fakeConnection = new FakeConnection(id++);
             var hubPlayer = newPlayer.GetComponent<ReferenceHub>();
 
             AllDummies.Add(hubPlayer);
-
             hubPlayer.characterClassManager._privUserId = $"{userId}-{id}@server";
             hubPlayer.characterClassManager.InstanceMode = ClientInstanceMode.Unverified;
-            NetworkServer.AddPlayerForConnection(fakeConnection, newPlayer);
-            
+            NetworkServer.AddPlayerForConnection(new FakeConnection(id++), newPlayer);
+
+            foreach (var target in ReferenceHub.AllHubs.Where(x => x != ReferenceHub.HostHub))
+                NetworkServer.SendSpawnMessage(hubPlayer.networkIdentity, target.connectionToClient);
 
             try
             {
@@ -83,9 +84,16 @@ namespace SCP575.Resources
             {
                 foreach (var hub in AllDummies)
                 {
-                    AllDummies.Remove(hub);
-                    NetworkServer.Destroy(hub.gameObject);
+                    var dummy = DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == hub);
+                    dummy.StopAudio();
+
+                    Timing.CallDelayed(0.2f, () =>
+                    {
+                        AllDummies.Remove(hub);
+                        NetworkServer.RemovePlayerForConnection(hub.connectionToClient, true);
+                    });
                 }
+
                 AllDummies.Clear();
             }
         }
@@ -94,18 +102,28 @@ namespace SCP575.Resources
         {
             if (!AllDummies.Contains(hub))
                 throw new ArgumentOutOfRangeException("hub", "Dummy player is not on the Dummies list");
+            var dummy = DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == hub);
+            dummy.StopAudio();
 
-            AllDummies.Remove(hub);
-            NetworkServer.RemovePlayerForConnection(hub.connectionToClient, true);
+            Timing.CallDelayed(0.2f, () =>
+            {
+                AllDummies.Remove(hub);
+                NetworkServer.RemovePlayerForConnection(hub.connectionToClient, true);
+            });
         }
 
         public static void DestroyDummy(DummyPlayer hub)
         {
             if (!AllDummies.Contains(hub.ReferenceHub))
                 throw new ArgumentOutOfRangeException("hub", "Dummy player is not on the Dummies list");
+            hub.StopAudio();
 
-            AllDummies.Remove(hub.ReferenceHub);
-            NetworkServer.RemovePlayerForConnection(hub.ReferenceHub.connectionToClient, true);
+            Timing.CallDelayed(0.2f, () =>
+            {
+                AllDummies.Remove(hub.ReferenceHub);
+                NetworkServer.RemovePlayerForConnection(hub.ReferenceHub.connectionToClient, true);
+            });
+            
         }
     }
 
@@ -118,12 +136,20 @@ namespace SCP575.Resources
         {
             _hub = hub;
             _id = id;
+            AudioPlayerBase = AudioPlayerBase.Get(ReferenceHub);
+            Dummies.DummiesPlayers.Add(this);
         }
 
         /// <summary>
         /// Gets dummy ReferenceHub
         /// </summary>
         public ReferenceHub ReferenceHub => _hub;
+
+
+        /// <summary>
+        /// Gets <see cref="SCPSLAudioApi.AudioCore.AudioPlayerBase"/> of the dummy.
+        /// </summary>
+        public readonly AudioPlayerBase AudioPlayerBase;
 
         /// <summary>
         /// Get dummy id.
@@ -276,32 +302,27 @@ namespace SCP575.Resources
             get => ReferenceHub.playerStats.StatModules[2].CurValue;
             set => ReferenceHub.playerStats.StatModules[2].CurValue = value;
         }
-    }
 
-    public class DummyAudioPlayer : AudioPlayerBase
-    {
-        public static new DummyAudioPlayer Get(ReferenceHub hub)
+        public void StopAudio()
         {
-            if (AudioPlayers.TryGetValue(hub, out AudioPlayerBase player))
-            {
-                if (player is DummyAudioPlayer cplayer1)
-                    return cplayer1;
-            }
-
-            var cplayer = hub.gameObject.AddComponent<DummyAudioPlayer>();
-            cplayer.Owner = hub;
-            cplayer.BroadcastChannel = VoiceChatChannel.Proximity;
-
-            AudioPlayers.Add(hub, cplayer);
-            return cplayer;
+            AudioPlayerBase.Stoptrack(true);
         }
 
-        public static void Remove(ReferenceHub hub)
+        public void QueueAudio(string filepath)
         {
-            if(AudioPlayers.TryGetValue(hub,out AudioPlayerBase player))
-            {
-                AudioPlayers.Remove(hub);
-            }
+            AudioPlayerBase.Enqueue(filepath, -1);
+        }
+
+        public void PlayAudio(string filepath, VoiceChatChannel channel = VoiceChatChannel.Proximity, float volume = 85, Player player = null)
+        {
+            StopAudio(); // just in case
+            AudioPlayerBase.BroadcastChannel = channel;
+            AudioPlayerBase.Volume = volume;
+            if (player != null)
+                AudioPlayerBase.BroadcastTo.Add(player.PlayerId);
+
+            AudioPlayerBase.Enqueue(filepath, 0);
+            AudioPlayerBase.Play(0);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using InventorySystem.Items.Firearms;
 using InventorySystem.Items.Flashlight;
 using InventorySystem.Items.Usables;
@@ -166,13 +167,9 @@ namespace SCP575.Resources.Components
         /// </summary>
         private void OnDestroy()
         {
-            var audioPlayer = DummyAudioPlayer.Get(ReferenceHub);
+            var dummyPlayer = Dummies.DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == ReferenceHub);
 
-            if(audioPlayer != null)
-            {
-                audioPlayer.Stoptrack(true);
-                DummyAudioPlayer.Remove(ReferenceHub);
-            }
+            dummyPlayer?.StopAudio();
             
             Timing.CallDelayed(0.5f, () =>
             {

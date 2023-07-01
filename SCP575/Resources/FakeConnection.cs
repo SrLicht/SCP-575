@@ -12,7 +12,7 @@ namespace SCP575.Resources
         {
         }
 
-        public override string address => "YourMom";
+        public override string address => "InYourBed";
 
         public override void Send(ArraySegment<byte> segment, int channelId = 0)
         {

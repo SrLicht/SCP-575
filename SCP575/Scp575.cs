@@ -125,10 +125,14 @@ namespace SCP575
         {
             if (Config.BlackOut.RandomInitialDelay)
             {
-                yield return Timing.WaitForSeconds(_rng.Next((int)Config.BlackOut.InitialMinDelay, (int)Config.BlackOut.InitialMaxDelay));
+                var delay = _rng.Next((int)Config.BlackOut.InitialMinDelay, (int)Config.BlackOut.InitialMaxDelay);
+
+                Log.Debug($"Random delay activated, waiting for {delay} seconds", Config.Debug);
+                yield return Timing.WaitForSeconds(delay);
             }
             else
             {
+                Log.Debug($"Waiting for {Config.BlackOut.InitialDelay} seconds", Config.Debug);
                 yield return Timing.WaitForSeconds(Config.BlackOut.InitialDelay);
             }
 
@@ -248,14 +252,9 @@ namespace SCP575
 
                 if (!Config.Scp575.PlaySounds) return;
                 if (!Extensions.AudioFileExist()) Log.Error($"There is no .ogg file in the folder {AudioPath}");
-                var audioPlayer = DummyAudioPlayer.Get(scp575.ReferenceHub);
                 var audioFile = Extensions.GetAudioFilePath();
-                audioPlayer.Enqueue(audioFile, -1);
-                audioPlayer.LogDebug = Config.AudioDebug;
-                //This will cause only the victim to be able to hear the music.
-                audioPlayer.BroadcastTo.Add(victim.PlayerId);
-                audioPlayer.Volume = Config.Scp575.SoundVolume;
-                audioPlayer.Play(0);
+                scp575.PlayAudio(audioFile,channel: VoiceChatChannel.RoundSummary, volume: Config.Scp575.SoundVolume);
+                scp575.AudioPlayerBase.LogDebug = Config.AudioDebug;
                 Log.Debug($"Playing sound {audioFile}", Config.Debug);
             }
             catch (Exception e)
