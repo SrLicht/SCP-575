@@ -181,6 +181,9 @@ namespace SCP575.Resources.Components
         /// </summary>
         private void OnDestroy()
         {
+            if (Scp575.Instance.Config.BlackOut.EndBlackoutWhenDisappearing)
+                Extensions.EndBlackout();
+
             var dummyPlayer = Dummies.DummiesPlayers.FirstOrDefault(d => d.ReferenceHub == ReferenceHub);
 
             dummyPlayer?.StopAudio();

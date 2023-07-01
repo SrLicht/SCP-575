@@ -1,7 +1,9 @@
 using MapGeneration;
 using Mirror;
 using PluginAPI.Core;
+using RemoteAdmin;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +13,7 @@ namespace SCP575.Resources
 {
     public static class Extensions
     {
+        private static List<RoomLightController> _roomLightsAffected = new();
         /// <summary>
         /// Checks for .ogg files in the sounds folder
         /// </summary>
@@ -60,9 +63,10 @@ namespace SCP575.Resources
         /// Turns off the lights in the specified zone, for a period of time.
         /// </summary>
         /// <param name="duration">The duration in seconds of the blackout</param>
-        public static void FlickerLights(float duration, bool antiScp173 = false)
+        public static void StartBlackout(float duration, bool antiScp173 = false)
         {
             var roomLightControllers = RoomLightController.Instances;
+            _roomLightsAffected.Clear();
 
             if (Scp575.Instance.Config.ActiveInHeavy)
             {
@@ -71,7 +75,9 @@ namespace SCP575.Resources
                     if (controller.Room.Zone != FacilityZone.HeavyContainment ||
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
+
                     controller.ServerFlickerLights(duration);
+                    _roomLightsAffected.Add(controller);
                 }
             }
 
@@ -85,6 +91,7 @@ namespace SCP575.Resources
                             Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
                             Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
                         controller.ServerFlickerLights(duration);
+                        _roomLightsAffected.Add(controller);
                     }
                 }
             }
@@ -97,7 +104,19 @@ namespace SCP575.Resources
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Count > 0 &&
                         Scp575.Instance.Config.BlackOut.BlackListRooms.Contains(controller.Room.Name)) continue;
                     controller.ServerFlickerLights(duration);
+                    _roomLightsAffected.Add(controller);
                 }
+            }
+        }
+
+        /// <summary>
+        /// End current blackout.
+        /// </summary>
+        public static void EndBlackout()
+        {
+            foreach(var roomLight in _roomLightsAffected)
+            {
+                roomLight.ServerFlickerLights(0);
             }
         }
 

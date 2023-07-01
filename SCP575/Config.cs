@@ -78,6 +78,9 @@ namespace SCP575
         [Description("The minimum duration of a delay after a blackout")]
         public int MaxDelay { get; set; } = 400;
 
+        [Description("If the SCP-575 disappears before the duration of the blackout should the blackout end?")]
+        public bool EndBlackoutWhenDisappearing { get; set; } = true;
+
         [Description("Before starting the blackout Cassie will say this message")]
         public string CassieMessage { get; set; } =
             "facility power system failure in 3 . pitch_.80 2 . pitch_.60 1 . pitch_.49 . .g1 pitch_.42  .g2 pitch_.31  .g5";
@@ -198,6 +201,6 @@ namespace SCP575
         public string Spawning { get; set; } = "Spawning a SCP-575 to hunt {0} for {1} seconds";
 
         [YamlMember(ScalarStyle = YamlDotNet.Core.ScalarStyle.DoubleQuoted)]
-        public string HelpResponse { get; set; } = "Correct use of the command {0}\nPlayer ID | It is a numerical ID that changes with each new round and each time someone connects to the server again.\nDuration | The time (in seconds) that the SCP-575 will hunt someone";
+        public string HelpResponse { get; set; } = "Correct use of the command {0}\nPlayer ID | It is a numerical ID that changes with each new round and each time someone connects to the server again.\nDuration | The time (in seconds) that the SCP-575 will hunt someone\n\nNote that this command does not turn off the lights, so if the SCP-575 is in a lit room for more than 5 seconds it will disappear.";
     }
 }

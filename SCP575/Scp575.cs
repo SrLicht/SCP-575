@@ -167,7 +167,7 @@ namespace SCP575
                 }
 
                 // Turn off the lights in the area
-                Extensions.FlickerLights(blackoutDuration, antiScp173);
+                Extensions.StartBlackout(blackoutDuration, antiScp173);
 
                 // Decide the delay by calculating between the minimum and the maximum value.
                 yield return Timing.WaitForSeconds(_rng.Next(Config.BlackOut.MinDelay, Config.BlackOut.MaxDelay) +
@@ -349,6 +349,7 @@ namespace SCP575
                 if (player.Role == RoleTypeId.Scp173)
                 {
                     value = true;
+                    break;
                 }
             }
 
