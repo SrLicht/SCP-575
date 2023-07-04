@@ -26,11 +26,11 @@ namespace SCP575.Command
         {
             if (sender != null)
             {
-                /*if (!Round.IsRoundStarted)
+                if (!Round.IsRoundStarted)
                 {
                     response = Scp575.Instance.Config.CommandResponses.RoundHasNotStarted;
                     return false;
-                }*/
+                }
                 // Display help response.
                 if (arguments.Count < 1 || arguments.IsEmpty() || arguments.Count > 2)
                 {
@@ -62,7 +62,6 @@ namespace SCP575.Command
 
                 response = string.Format(Scp575.Instance.Config.CommandResponses.Spawning, victim.Nickname, duration);
                 return true;
-
             }
             else
             {
