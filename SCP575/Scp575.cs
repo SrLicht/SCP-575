@@ -44,7 +44,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.1.1";
+        private const string Version = "1.1.2";
 
         [PluginPriority(LoadPriority.High)]
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]

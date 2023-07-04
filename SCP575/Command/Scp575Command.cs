@@ -26,11 +26,11 @@ namespace SCP575.Command
         {
             if (sender != null)
             {
-                if (!Round.IsRoundStarted)
+                /*if (!Round.IsRoundStarted)
                 {
                     response = Scp575.Instance.Config.CommandResponses.RoundHasNotStarted;
                     return false;
-                }
+                }*/
                 // Display help response.
                 if (arguments.Count < 1 || arguments.IsEmpty() || arguments.Count > 2)
                 {
@@ -62,6 +62,7 @@ namespace SCP575.Command
 
                 response = string.Format(Scp575.Instance.Config.CommandResponses.Spawning, victim.Nickname, duration);
                 return true;
+
             }
             else
             {
@@ -70,7 +71,7 @@ namespace SCP575.Command
             }
         }
 
-        public void SpawnScp575(Player victim, float duration)
+        public void SpawnScp575(Player victim, float duration, bool everyoneCanHear = false)
         {
             var scp575 = Dummies.CreateDummy("Scp575", "SCP-575");
 
@@ -124,7 +125,14 @@ namespace SCP575.Command
                 return;
             }
 
-            scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Scp575.Instance.Config.Scp575.SoundVolume);
+            if (everyoneCanHear)
+            {
+                scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Scp575.Instance.Config.Scp575.SoundVolume);
+            }
+            else
+            {
+                scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Scp575.Instance.Config.Scp575.SoundVolume, player: victim);
+            }
             Log.Debug($"Playing sound {audioFile}", Scp575.Instance.Config.Debug);
         }
     }
