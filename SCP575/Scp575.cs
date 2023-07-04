@@ -44,7 +44,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.1.2";
+        private const string Version = "1.1.3";
 
         [PluginPriority(LoadPriority.High)]
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
@@ -259,7 +259,7 @@ namespace SCP575
                     scp575.AudioPlayerBase.LogDebug = Config.AudioDebug;
 
                 var audioFile = Extensions.GetRandomAudioFile();
-                scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Config.Scp575.SoundVolume);
+                scp575.PlayAudio(audioFile, channel: VoiceChatChannel.RoundSummary, volume: Config.Scp575.SoundVolume, player: victim);
                 Log.Debug($"Playing sound {audioFile}", Config.Debug);
             }
             catch (Exception e)
