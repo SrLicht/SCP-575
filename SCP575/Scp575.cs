@@ -44,7 +44,7 @@ namespace SCP575
         /// <summary>
         /// Plugin version
         /// </summary>
-        private const string Version = "1.1.4";
+        private const string Version = "1.1.4.1";
 
         [PluginPriority(LoadPriority.High)]
         [PluginEntryPoint("SCP-575", Version, "Add SCP-575 to SCP:SL", "SrLicht")]
@@ -53,7 +53,6 @@ namespace SCP575
             try
             {
                 Instance = this;
-                Log.Warning("Since the release of &213.1&r it is necessary to update &1SCPSLAudioApi&r to version &10.0.5&r if you have already done it ignore this warning.");
                 SCPSLAudioApi.Startup.SetupDependencies();
                 if (!Config.IsEnabled) return;
                 var configPath = Path.Combine(Paths.LocalPlugins.Plugins, "SCP-575");
