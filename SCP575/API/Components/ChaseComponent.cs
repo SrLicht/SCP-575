@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SCP575.API.Components
 {
     /// <summary>
-    /// 
+    /// SCP-575 main componente that manage chasing the player and kill it.
     /// </summary>
     public class ChaseComponent : MonoBehaviour
     {
