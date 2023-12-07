@@ -1,5 +1,6 @@
-using MapGeneration;
+﻿using MapGeneration;
 using PlayerRoles;
+using PluginAPI.Helpers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -7,53 +8,80 @@ using YamlDotNet.Serialization;
 
 namespace SCP575
 {
+    /// <summary>
+    /// Plugin config class.
+    /// </summary>
     public class Config
     {
-        [Description("Is the plugin enabled ?")]
+        /// <summary>
+        /// Gets or sets if the plugin is enabled.
+        /// </summary>
+        [Description("Set if the plugin is enabled. If 'false' the plugin will not load any events.")]
         public bool IsEnabled { get; set; } = true;
 
-        [Description("Enable the Logs.Debug of light points and other logs.")]
-        public bool Debug { get; set; } = false;
+        /// <summary>
+        /// Gets or sets if the plugin is in debug mode.
+        /// </summary>
+        [Description("set if the plugin is in debug mode. enabling this will activate log debugs in the code, this is useful to identify issues and report them in Github.")]
+        public bool DebugMode { get; set; } = false;
 
-        [Description("Path to the folder where the audios are located")]
+        /// <summary>
+        /// Gets the plugin folder where the audio file will be stored.
+        /// </summary>
+        [YamlIgnore]
+        private static string ConfigPath => Path.Combine(Paths.LocalPlugins.Plugins, "SCP-575");
+
+        /// <summary>
+        /// Gets or sets the path to the audio folder.
+        /// </summary>
+        [Description("Path to the folder where the audios are located | Delete to regenerated")]
         public string PathToAudios { get; set; } = Path.Combine(ConfigPath, "Audios");
 
-        [Description("Enable the Logs.Debug of SCPSLAudioApi, warning can be very spammy.")]
-        public bool AudioDebug { get; set; } = false;
-
-        [Description("Does the blackout affect Entrance Zone ?")]
-        public bool ActiveInEntrance { get; set; } = false;
-
-        [Description("Does the blackout affect Heavy Contaiment ?")]
-        public bool ActiveInHeavy { get; set; } = false;
-
-        [Description("Does the blackout affect Light Contaiment ?")]
-        public bool ActiveInLight { get; set; } = true;
-
+        /// <summary>
+        /// Gets or sets the spawn chance of SCP-575.
+        /// </summary>
         [Description("The per-round probability of SCP-575 appearing")]
         public int SpawnChance { get; set; } = 40;
 
+        /// <summary>
+        /// Gets or sets whether SCP-575 should not appear if there is an SCP-173 in the game.
+        /// </summary>
         [Description("If there is an SCP-173 in the round, SCP-575 will deactivate for that round.")]
         public bool DisableForScp173 { get; set; } = false;
 
-        [Description("An alternative to the above configuration, if there is a SCP-173 in the light contaiment zone round it will never suffer a blackout. DO NOT ACTIVATE BOTH AT THE SAME TIME")]
-        public bool DisableBlackoutForScp173 { get; set; } = false;
-
+        /// <summary>
+        /// Gets or sets all configuracion related to the black out.
+        /// </summary>
         [Description("All blackout related configuration")]
         public BlackoutConfig BlackOut { get; set; } = new BlackoutConfig();
 
+        /// <summary>
+        /// Gets or sets all configuration related to the SCP-575.
+        /// </summary>
         [Description("All configuration related to the SCP-575")]
         public Scp575Config Scp575 { get; set; } = new Scp575Config();
 
+        /// <summary>
+        /// Gets or sets all responses for the commands.
+        /// </summary>
         [Description("Here you can translate the responses given by the command when executed, unfortunately due to NWAPI limitations I cannot give a configuration to change the command description.")]
         public ResponseCommandConfig CommandResponses { get; set; } = new ResponseCommandConfig();
-
-        [YamlIgnore]
-        private static string ConfigPath => Path.Combine(PluginAPI.Helpers.Paths.LocalPlugins.Plugins, "SCP-575");
     }
 
+#pragma warning disable CS1591 // Falta el comentario XML para el tipo o miembro visible públicamente
+    /// <summary>
+    /// All configuration related to the blackout.
+    /// </summary>
     public class BlackoutConfig
     {
+        [Description("All facility zones where a blackout can occur")]
+        public List<FacilityZone> ActiveZones { get; set; } = new()
+        {
+            FacilityZone.LightContainment,
+            FacilityZone.HeavyContainment,
+            FacilityZone.Entrance,
+        };
+
         [Description("After this time, the constant blackouts will begin to be executed.")]
         public float InitialDelay { get; set; } = 300f;
 
@@ -111,6 +139,9 @@ namespace SCP575
         };
     }
 
+    /// <summary>
+    /// All configuration related to the SCP-575.
+    /// </summary>
     public class Scp575Config
     {
         [Description("Enabling this will activate the patch that prevents the server from making the SCP-575 not float, causing a rather strange movement.  I thought it was fun to leave it as an option")]
@@ -189,6 +220,9 @@ namespace SCP575
         public string LightPointKillMessage { get; set; } = "SCP-575 disappears for now";
     }
 
+    /// <summary>
+    /// All respones for the commands.
+    /// </summary>
     public class ResponseCommandConfig
     {
         public string RoundHasNotStarted { get; set; } = "You cannot use this command if the round has not started.";
@@ -203,4 +237,7 @@ namespace SCP575
         [YamlMember(ScalarStyle = YamlDotNet.Core.ScalarStyle.DoubleQuoted)]
         public string HelpResponse { get; set; } = "Correct use of the command {0}\nPlayer ID | It is a numerical ID that changes with each new round and each time someone connects to the server again.\nDuration | The time (in seconds) that the SCP-575 will hunt someone\n\nNote that this command does not turn off the lights, so if the SCP-575 is in a lit room for more than 5 seconds it will disappear.";
     }
+
+
+#pragma warning restore CS1591 // Falta el comentario XML para el tipo o miembro visible públicamente
 }
