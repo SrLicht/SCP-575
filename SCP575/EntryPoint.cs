@@ -162,8 +162,15 @@ namespace SCP575
                     (float)Random.NextDouble() * (Config.BlackOut.MaxDuration - Config.BlackOut.MinDuration) +
                     Config.BlackOut.MinDuration;
 
-                // Send Cassie's message to everyone
-                RespawnEffectsController.PlayCassieAnnouncement(Config.BlackOut.CassieMessage, Config.BlackOut.CassieIsHold, Config.BlackOut.CassieIsNoise);
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+                if (!string.IsNullOrEmpty(Config.BlackOut.Cassie?.Message) && Config.BlackOut.Cassie != null)
+                {
+                    // Send Cassie's message to everyone
+
+                    RespawnEffectsController.PlayCassieAnnouncement(Config.BlackOut.Cassie?.Message, Config.BlackOut.Cassie.IsHeld, Config.BlackOut.Cassie.IsNoisy, Config.BlackOut.Cassie.IsSubtitle);
+
+                }
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
 
                 // Wait for Cassie to finish speaking
                 yield return Timing.WaitForSeconds(Config.BlackOut.DelayAfterCassie);
@@ -187,6 +194,9 @@ namespace SCP575
                     {
                         BlackoutExtensions.SpawnScp575(victim, blackoutDuration);
                     }
+
+                    if (victim is null)
+                        Log.Debug($"{nameof(BlackoutExtensions.SpawnScp575)}: victim player is null.", Config.DebugMode);
 
                 }
                 catch (Exception e)
@@ -233,8 +243,6 @@ namespace SCP575
                 // Get all players and filter based on specific conditions.
                 var players = Player.GetPlayers()
                     .Where(player =>
-                        player != null &&
-                        player.Room != null &&
                         player.IsAlive &&
                         !player.IsSCP &&
                         !player.IsTutorial &&
@@ -244,14 +252,16 @@ namespace SCP575
                 var activeZones = Config.BlackOut.ActiveZones;
 
                 // Filter players based on active blackout zones.
-                players = activeZones switch
+                if (activeZones.Count > 0)
                 {
-                    { Count: 0 } => players, // No active zones specified, keep all players.
-                    _ when activeZones.Contains(FacilityZone.LightContainment) => players.Where(player => player.Zone == FacilityZone.LightContainment),
-                    _ when activeZones.Contains(FacilityZone.HeavyContainment) => players.Where(player => player.Zone == FacilityZone.HeavyContainment),
-                    _ when activeZones.Contains(FacilityZone.Entrance) => players.Where(player => player.Zone == FacilityZone.Entrance),
-                    _ => Enumerable.Empty<Player>() // No valid active zones specified, return an empty collection.
-                };
+                    players = players.Where(player => activeZones.Contains(player.Zone));
+                }
+
+                if(activeZones.Count == 0)
+                {
+                    Log.Error($"{nameof(GetVictim)}: Config.BlackOut.ActiveZones is 0");
+                    return null;
+                }
 
                 var filteredPlayers = players.ToList();
 
