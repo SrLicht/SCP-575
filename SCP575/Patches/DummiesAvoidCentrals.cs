@@ -1,19 +1,16 @@
+﻿using CentralAuth;
 using HarmonyLib;
 using NorthwoodLib.Pools;
-using SCP575.Resources;
+using SCP575.API.Extensions;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 
-namespace SCP575.Patch
+namespace SCP575.Patches
 {
-    /// <summary>
-    /// Thanks Jesus-QC#4544 for the patch.
-    /// </summary>
-    [HarmonyPatch(typeof(CharacterClassManager), nameof(CharacterClassManager.InstanceMode), MethodType.Setter)]
-    public class DummysAvoidCentralServers
+    [HarmonyPatch(typeof(PlayerAuthenticationManager), nameof(PlayerAuthenticationManager.InstanceMode), MethodType.Setter)]
+    internal class DummiesAvoidCentrals
     {
-        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions,
-            ILGenerator generator)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Shared.Rent(instructions);
 
@@ -26,7 +23,7 @@ namespace SCP575.Patch
                 new(OpCodes.Ldsfld, AccessTools.Field(typeof(Dummies), nameof(Dummies.AllDummies))),
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Ldfld,
-                    AccessTools.Field(typeof(CharacterClassManager), nameof(CharacterClassManager._hub))),
+                    AccessTools.Field(typeof(PlayerAuthenticationManager), nameof(PlayerAuthenticationManager._hub))),
                 new(OpCodes.Callvirt,
                     AccessTools.Method(typeof(HashSet<ReferenceHub>), nameof(HashSet<ReferenceHub>.Contains))),
                 new(OpCodes.Brfalse_S, skip),
