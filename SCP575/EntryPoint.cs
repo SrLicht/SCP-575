@@ -36,7 +36,7 @@ namespace SCP575
         /// <summary>
         /// Gets the plugin version.
         /// </summary>
-        public const string Version = "2.0.0";
+        public const string Version = "2.0.1";
 
         /// <summary>
         /// Private HarmonyID for unpatching assembly patches.

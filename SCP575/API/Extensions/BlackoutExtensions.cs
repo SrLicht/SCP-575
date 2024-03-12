@@ -1,4 +1,5 @@
-﻿using Interactables.Interobjects.DoorUtils;
+﻿using CustomPlayerEffects;
+using Interactables.Interobjects.DoorUtils;
 using MapGeneration;
 using MEC;
 using PluginAPI.Core;
@@ -167,6 +168,10 @@ namespace SCP575.API.Extensions
                 scp575.ReferenceHub.nicknameSync.ViewRange = EntryPoint.Instance.Config.Scp575.ViewRange;
 
                 scp575.IsGodModeEnabled = true;
+
+                if (EntryPoint.Instance.Config.Scp575.RoleType != PlayerRoles.RoleTypeId.Scp106 && EntryPoint.Instance.Config.Scp575.GiveGhostlyEffect)
+                    scp575.ReferenceHub.playerEffectsController.EnableEffect<Ghostly>();
+
 
                 Timing.CallDelayed(0.3f, () =>
                 {

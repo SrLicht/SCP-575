@@ -208,6 +208,9 @@ namespace SCP575
         [Description("Set the SCP-575 role, by default, it is SCP-106.")]
         public RoleTypeId RoleType { get; set; } = RoleTypeId.Scp106;
 
+        [Description("If the roletype is not Scp106 i will give him the Ghostly effect for go throw the doors")]
+        public bool GiveGhostlyEffect { get; set; } = true;
+
         /// <summary>
         /// The death message that will appear when players are killed by SCP-575.
         /// </summary>
